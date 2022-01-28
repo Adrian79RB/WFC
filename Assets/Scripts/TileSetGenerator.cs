@@ -23,6 +23,8 @@ public class TileSetGenerator : MonoBehaviour
     Vector3 originalPos;
     Vector3 currentPos;
     bool gridCleared = false;
+    bool preDefinedPath = false;
+    int[,] predefinedPathCoor;
 
     // Initialization method whcih prepare all the variables needed
     private void Initialize()
@@ -43,20 +45,20 @@ public class TileSetGenerator : MonoBehaviour
 
         if (transform.childCount > 0)
         {
+            preDefinedPath = true;
+            predefinedPathCoor = new int[transform.childCount, 2];
             for (int i = 0; i < transform.childCount; i++)
             {
-                int[] coor = { Mathf.RoundToInt(transform.GetChild(i).position.x), Mathf.RoundToInt(transform.GetChild(i).position.z) };
+                int[] coor = { Mathf.FloorToInt(transform.GetChild(i).position.z), Mathf.FloorToInt(transform.GetChild(i).position.x) };
+                predefinedPathCoor[i, 0] = coor[0];
+                predefinedPathCoor[i, 1] = coor[1];
                 int choosenTile = -1;
-                Debug.Log("Cell selected: " + coor[0] + "; "+ coor[1]);
 
                 for (int k = 0; k < tileSet.Length; k++)
                 {
-                    Debug.Log("Tile from tileSet: " + tileSet[k].tile.transform.name + "; tile from cell: " + transform.GetChild(i).name);
-                    if (tileSet[k].tile.transform.name == transform.GetChild(i).name)
+                    if (transform.GetChild(i).name.StartsWith(tileSet[k].tile.transform.name))
                         choosenTile = k;
                 }
-
-                Debug.Log("Tile selected: " + choosenTile);
 
                 for (int j = 0; j < grid[coor[0], coor[1]].domain.Length; j++)
                 {
@@ -67,7 +69,12 @@ public class TileSetGenerator : MonoBehaviour
                 grid[coor[0], coor[1]].visited[choosenTile]++;
                 grid[coor[0], coor[1]].domainCount = 1;
                 grid[coor[0], coor[1]].tileChosen = tileSet[choosenTile].tile;
+                grid[coor[0], coor[1]].CalculateEntropy(tileSet);
             }
+        }
+        else
+        {
+            preDefinedPath = false;
         }
     }
 
@@ -103,8 +110,29 @@ public class TileSetGenerator : MonoBehaviour
         {
             gridCleared = false;
             Initialize();
-            var firstCell = SearchNextGridCell();
-            TileElection(firstCell[0], firstCell[1]);
+            if (preDefinedPath)
+            {
+                for(int index = 0; index < predefinedPathCoor.GetLength(0); index++)
+                {
+                    if (predefinedPathCoor[index, 1] > 0)
+                        ConstraintPropagation(predefinedPathCoor[index, 0], predefinedPathCoor[index, 1] - 1, 3, grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
+                    if (predefinedPathCoor[index, 1] < (numCol - 1))
+                        ConstraintPropagation(predefinedPathCoor[index, 0], predefinedPathCoor[index, 1] + 1, 1, grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
+                    if (predefinedPathCoor[index, 0] > 0)
+                        ConstraintPropagation(predefinedPathCoor[index, 0] - 1, predefinedPathCoor[index, 1], 2, grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
+                    if (predefinedPathCoor[index, 0] < (numRow - 1))
+                        ConstraintPropagation(predefinedPathCoor[index, 0] + 1, predefinedPathCoor[index, 1], 0, grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
+                }
+
+                int[] nextCel = SearchNextGridCell();
+                if (nextCel[0] != 1 && nextCel[1] != 0)
+                    TileElection(nextCel[0], nextCel[1]);
+            }
+            else
+            {
+                var firstCell = SearchNextGridCell();
+                TileElection(firstCell[0], firstCell[1]);
+            }
         }
         else
         {

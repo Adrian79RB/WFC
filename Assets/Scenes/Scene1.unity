@@ -145,6 +145,10 @@ PrefabInstance:
       propertyPath: rotable
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5418396845535568953, guid: 0858052107535c6498429d14f8e82307, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: -4116274189922807622, guid: 7c3b4146d98af254c87a05fd290759e3, type: 3}
     - target: {fileID: 5778961961548056044, guid: 0858052107535c6498429d14f8e82307, type: 3}
       propertyPath: m_Name
       value: tileRectoH
@@ -329,7 +333,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1253016197
 MonoBehaviour:
@@ -350,9 +354,9 @@ MonoBehaviour:
   tileSet:
   - weight: 4
     tile: {fileID: 470729813}
-  - weight: 4
+  - weight: 7
     tile: {fileID: 5834694174408307640}
-  - weight: 4
+  - weight: 2
     tile: {fileID: 364857867}
   - weight: 1
     tile: {fileID: 27716072}
@@ -453,7 +457,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1001 &136836809806925377
 PrefabInstance:
@@ -525,7 +529,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1978591395344874151, guid: 33062f678f18f7046b023ac0ff695fcd, type: 3}
       propertyPath: m_RootOrder
-      value: 9
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1978591395344874151, guid: 33062f678f18f7046b023ac0ff695fcd, type: 3}
       propertyPath: m_LocalPosition.x
@@ -593,7 +597,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3063496358417731619, guid: 06f94612a802f024f8bff885026546de, type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3063496358417731619, guid: 06f94612a802f024f8bff885026546de, type: 3}
       propertyPath: m_LocalPosition.x
@@ -657,7 +661,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6079605534630977117, guid: 06ad2e3e1bd879944810855c24a2a6a6, type: 3}
       propertyPath: m_RootOrder
-      value: 8
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6079605534630977117, guid: 06ad2e3e1bd879944810855c24a2a6a6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -743,6 +747,10 @@ PrefabInstance:
       propertyPath: sideIndex.Array.data[3]
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5418396845535568953, guid: 0858052107535c6498429d14f8e82307, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: -4116274189922807622, guid: 7c3b4146d98af254c87a05fd290759e3, type: 3}
     - target: {fileID: 5778961961548056044, guid: 0858052107535c6498429d14f8e82307, type: 3}
       propertyPath: m_Name
       value: tileRecto
@@ -857,11 +865,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2057118592014023962, guid: 5d1a3feb3f3596f4f9c89735016f7a79, type: 3}
       propertyPath: m_Name
-      value: tileCurva
-      objectReference: {fileID: 0}
-    - target: {fileID: 6878166069550519300, guid: 5d1a3feb3f3596f4f9c89735016f7a79, type: 3}
-      propertyPath: rotable
-      value: 0
+      value: tileCurva1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d1a3feb3f3596f4f9c89735016f7a79, type: 3}

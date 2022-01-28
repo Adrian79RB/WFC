@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8555847914314858372}
   - component: {fileID: 6878166069550519300}
   m_Layer: 0
-  m_Name: tileCurva
+  m_Name: tileCurva1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -110,5 +110,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sideIndex: 00000000000000000100000001000000
-  rotable: 1
   symetric: 1
