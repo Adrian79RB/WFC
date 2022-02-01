@@ -8,5 +8,4 @@ public class GridTile : MonoBehaviour
     [Tooltip("Each index indicates the possible connection with each side.")]
     public int[] sideIndex;
 
-    public bool symetric = true;
 }
