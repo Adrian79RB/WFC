@@ -10,6 +10,7 @@ public class IAVariable : MonoBehaviour
     public int[] visited;
     public BehaviourBlock blockChoosen;
     public float entropy;
+    public List<IAVariable> children;
 
     public void SetVariable(int size)
     {
@@ -36,11 +37,20 @@ public class IAVariable : MonoBehaviour
                     domain[i] = false;
             }
         }
+        else if(index < 0)
+        {
+            domainCount = 1;
+            for (int i = 0; i < domain.Length; i++)
+            {
+                domain[i] = false;
+            }
+        }
 
-        parent.children.Add(blockChoosen);
+        if(parent)
+            parent.children.Add(blockChoosen);
     }
 
-    public void CalculateEntropy(Tile[] tileSet)
+    public void CalculateEntropy(Block[] tileSet)
     {
         float auxiliar = 0f;
 
