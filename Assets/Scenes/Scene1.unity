@@ -256,6 +256,21 @@ MonoBehaviour:
   AttackDistance: 8
   ShootDistance: 15
   hitDistance: 1
+  enemyBlockSet:
+  - type: 0
+    weight: 4
+  - type: 1
+    weight: 4
+  - type: 2
+    weight: 3
+  - type: 3
+    weight: 3
+  - type: 4
+    weight: 1
+  - type: 5
+    weight: 1
+  agent: {fileID: 0}
+  waypoints: []
 --- !u!4 &1018782638
 Transform:
   m_ObjectHideFlags: 0
