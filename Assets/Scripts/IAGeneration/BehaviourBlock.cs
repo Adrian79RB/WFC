@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BehaviourBlock : MonoBehaviour
+public abstract class BehaviourBlock
 {
     [Tooltip("Enter conections used to get in this behaviour")]
     public int[] enterConnections; // 0 -> up side of the block; 1 -> left side of the block
@@ -23,6 +23,9 @@ public abstract class BehaviourBlock : MonoBehaviour
 
     public void SetConnections(int[] Connections)
     {
+        enterConnections = new int[Connections.Length/2];
+        exitConnections = new int[Connections.Length / 2];
+
         for (int i = 0; i < Connections.Length; i++)
         {
             if (i < Connections.Length / 2)
@@ -34,17 +37,17 @@ public abstract class BehaviourBlock : MonoBehaviour
 
     public abstract bool RunCondition(Dictionary<string, float> gameData);
 
-    public abstract void Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData);
+    public abstract BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData);
 }
 
 public class Patrol : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["playerDeteted"] == 0f;
+        return gameData["playerDetected"] == 0f;
     }
 
-    public override void Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
+    public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
     {
         enemyAgent.GoPatrolling();
 
@@ -52,9 +55,11 @@ public class Patrol : BehaviourBlock
         {
             if (children[i].RunCondition(gameData))
             {
-                children[i].Run(enemyAgent, gameData);
+                return children[i];
             }
         }
+
+        return this;
     }
 }
 
@@ -62,10 +67,10 @@ public class Retreat : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["health"] < gameData["maxHealth"] / 3 || gameData["enemyNum"] < 5f || gameData["ammo"] < gameData["maxAmmo"] / 3;
+        return gameData["health"] < gameData["maxHealth"] / 3 || gameData["allyNum"] < 5f || gameData["ammo"] < gameData["maxAmmo"] / 3;
     }
 
-    public override void Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
+    public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
     {
         enemyAgent.RetreatToHome();
 
@@ -73,9 +78,11 @@ public class Retreat : BehaviourBlock
         {
             if (children[i].RunCondition(gameData))
             {
-                children[i].Run(enemyAgent, gameData);
+                return children[i];
             }
         }
+
+        return this;
     }
 }
 
@@ -87,7 +94,7 @@ public class StrategicPositioning : BehaviourBlock
         return gameData["distanceToPlayer"] > gameData["safeDistance"];
     }
 
-    public override void Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
+    public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
     {
         enemyAgent.SearchStrategicPos();
 
@@ -95,9 +102,11 @@ public class StrategicPositioning : BehaviourBlock
         {
             if (children[i].RunCondition(gameData))
             {
-                children[i].Run(enemyAgent, gameData);
+                return children[i];
             }
         }
+
+        return this;
     }
 }
 
@@ -108,7 +117,7 @@ public class GetClose : BehaviourBlock
         return gameData["distanceToPlayer"] < gameData["AttackDistance"];
     }
 
-    public override void Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
+    public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
     {
         enemyAgent.GetCloseToPlayer();
 
@@ -116,9 +125,11 @@ public class GetClose : BehaviourBlock
         {
             if (children[i].RunCondition(gameData))
             {
-                children[i].Run(enemyAgent, gameData);
+                return children[i];
             }
         }
+
+        return this;
     }
 }
 
@@ -129,7 +140,7 @@ public class GetAway : BehaviourBlock
         return gameData["distanceToPlayer"] < gameData["AttackDistance"];
     }
 
-    public override void Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
+    public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
     {
         enemyAgent.GetAwayFromPlayer();
 
@@ -137,9 +148,11 @@ public class GetAway : BehaviourBlock
         {
             if (children[i].RunCondition(gameData))
             {
-                children[i].Run(enemyAgent, gameData);
+                return children[i];
             }
         }
+
+        return this;
     }
 }
 
@@ -150,7 +163,7 @@ public class Attack : BehaviourBlock
         return gameData["DistanceToPlayer"] < gameData["hitDistance"];
     }
 
-    public override void Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
+    public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
     {
         enemyAgent.Attack();
 
@@ -158,9 +171,11 @@ public class Attack : BehaviourBlock
         {
             if (children[i].RunCondition(gameData))
             {
-                children[i].Run(enemyAgent, gameData);
+                return children[i];
             }
         }
+
+        return this;
     }
 }
 
@@ -171,7 +186,7 @@ public class Shoot : BehaviourBlock
         return gameData["DistanceToPlayer"] > gameData["shootDistance"];
     }
 
-    public override void Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
+    public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
     {
         enemyAgent.Shoot();
 
@@ -179,9 +194,11 @@ public class Shoot : BehaviourBlock
         {
             if (children[i].RunCondition(gameData))
             {
-                children[i].Run(enemyAgent, gameData);
+                return children[i];
             }
         }
+
+        return this;
     }
 }
 

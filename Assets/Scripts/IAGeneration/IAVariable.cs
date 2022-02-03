@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IAVariable : MonoBehaviour
+public class IAVariable : ScriptableObject
 {
     public bool[] domain;
     public int domainCount;
@@ -14,6 +14,7 @@ public class IAVariable : MonoBehaviour
 
     public void SetVariable(int size)
     {
+        children = new List<IAVariable>();
         domain = new bool[size];
         entropy = 0f;
 
@@ -25,7 +26,7 @@ public class IAVariable : MonoBehaviour
         domainCount = size;
     }
 
-    internal void SetBlock(BehaviourBlock currentBlock, BehaviourBlock parent, int index)
+    internal void SetBlock(BehaviourBlock currentBlock, int index)
     {
         blockChoosen = currentBlock;
         if(domainCount > 1)
@@ -45,9 +46,6 @@ public class IAVariable : MonoBehaviour
                 domain[i] = false;
             }
         }
-
-        if(parent)
-            parent.children.Add(blockChoosen);
     }
 
     public void CalculateEntropy(Block[] tileSet)

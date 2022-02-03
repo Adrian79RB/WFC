@@ -14,17 +14,17 @@ public struct Block
     public BehaviourBlock block;
 }
 
-public class BehaviourBlockGeneration : MonoBehaviour
+public class BehaviourBlockGeneration
 {
-    public int numCol;
-    public int numRow;
-    public int maxSteps;
+    public int numCol = 4;
+    public int numRow = 4;
+    public int maxSteps = 4;
     public const int connectionsNum = 4;
     public Block[] blockSet;
 
     IAVariable rootVariable;
     IAVariable[,] grid;
-    bool treeCleared;
+    bool treeCleared = true;
 
     private void Initialize()
     {
@@ -60,17 +60,18 @@ public class BehaviourBlockGeneration : MonoBehaviour
 
         grid = new IAVariable[numRow, numCol];
 
-        for (int i = 0; i < numRow; i++)
+        for (int i = 0; i < grid.GetLength(0); i++)
         {
-            for (int j = 0; j < numCol; j++)
+            for (int j = 0; j < grid.GetLength(1); j++)
             {
+                grid[i, j] = ScriptableObject.CreateInstance<IAVariable>();
                 grid[i, j].SetVariable(blockSet.Length);
             }
         }
 
         BehaviourBlock firstBlock = new Patrol();
         firstBlock.SetConnections(new int[connectionsNum] { -1, -1, 0, 0 });
-        grid[0, 0].SetBlock(firstBlock, null, -1);
+        grid[0, 0].SetBlock(firstBlock, -1);
         rootVariable = grid[0, 0];
     }
 
@@ -108,16 +109,41 @@ public class BehaviourBlockGeneration : MonoBehaviour
         currentNode.visited = null;
     }
 
-    public void Generate()
+    public BehaviourBlock Generate()
     {
         if (treeCleared)
         {
             treeCleared = false;
             Initialize();
+            var nextCell = SearchNextGridCell();
+            BlockElection(0, 0);
+
+            //Generate behaviour blocks children
+            GenerateBehaviourBlocksChildren(rootVariable);
+
+            return rootVariable.blockChoosen;
         }
         else
         {
             Debug.Log("Tree must be cleared before generating a new one");
+            return null;
+        }
+    }
+
+    private void GenerateBehaviourBlocksChildren(IAVariable currentVariable)
+    {
+        Debug.Log("Generando arbol, variable actual: " + currentVariable.blockChoosen);
+        if (currentVariable == null)
+            return;
+
+        currentVariable.blockChoosen.SetChildren(currentVariable.children);
+
+        for (int i = 0; i < currentVariable.children.Count; i++)
+        {
+            if (currentVariable.children[i] != null)
+            {
+                GenerateBehaviourBlocksChildren(currentVariable.children[i]);
+            }
         }
     }
 
@@ -184,7 +210,7 @@ public class BehaviourBlockGeneration : MonoBehaviour
                 chosenIndex = weightedRandom(availableBlocks);
             }
 
-            grid[rowIndex, colIndex].blockChoosen = blockSet[chosenIndex].block;
+            grid[rowIndex, colIndex].SetBlock(blockSet[chosenIndex].block,  chosenIndex);
         }
 
         //Propagate Constraints
@@ -192,16 +218,19 @@ public class BehaviourBlockGeneration : MonoBehaviour
         if (colIndex < (numCol - 1))
         {
             ConstraintPropagation(rowIndex, colIndex + 1, 1, grid[rowIndex, colIndex], 0);
-            if(!grid[rowIndex, colIndex].children.Contains( grid[rowIndex, (colIndex + 1)] ))
+
+            if (!grid[rowIndex, colIndex].children.Contains( grid[rowIndex, (colIndex + 1)] ))
                 grid[rowIndex, colIndex].children.Add(grid[rowIndex, (colIndex + 1)]);
         }
         if (rowIndex < (numRow - 1))
         {
             ConstraintPropagation(rowIndex + 1, colIndex, 2, grid[rowIndex, colIndex], 0);
-            if(!grid[rowIndex, colIndex].children.Contains( grid[(rowIndex + 1), colIndex] ))
+
+            if (!grid[rowIndex, colIndex].children.Contains( grid[(rowIndex + 1), colIndex] ))
                 grid[rowIndex, colIndex].children.Add(grid[(rowIndex + 1), colIndex]);
         }
 
+        Debug.Log("Bloque establecido: " + grid[rowIndex, colIndex].blockChoosen + "; hijos: " + grid[rowIndex, colIndex].children.Count);
         int[] nextGridCell = SearchNextGridCell();
         if (nextGridCell[0] != -1 && nextGridCell[1] != -1)
             BlockElection(nextGridCell[0], nextGridCell[1]);
@@ -274,7 +303,7 @@ public class BehaviourBlockGeneration : MonoBehaviour
                 }
             }
 
-            grid[rowIndex, colIndex].blockChoosen = blockSet[chosenIndex].block;
+            grid[rowIndex, colIndex].SetBlock(blockSet[chosenIndex].block, chosenIndex);
         }
 
         //Calculates the entropy of the block
@@ -284,15 +313,17 @@ public class BehaviourBlockGeneration : MonoBehaviour
         if(colIndex < (numCol - 1))
         {
             ConstraintPropagation(rowIndex, colIndex + 1, 1, grid[rowIndex, colIndex], step);
-            if (grid[rowIndex, colIndex].domainCount == 1)
+
+            if (grid[rowIndex, colIndex].domainCount == 1 && !grid[rowIndex, colIndex].children.Contains(grid[rowIndex, (colIndex + 1)]))
                 grid[rowIndex, colIndex].children.Add(grid[rowIndex, colIndex + 1]);
         }
 
         if(rowIndex < (numRow - 1))
         {
             ConstraintPropagation(rowIndex + 1, colIndex, 2, grid[rowIndex, colIndex], step);
-            if (grid[rowIndex, colIndex].domainCount == 1)
-                grid[rowIndex, colIndex].children.Add(grid[rowIndex, colIndex]);
+
+            if (grid[rowIndex, colIndex].domainCount == 1 && !grid[rowIndex, colIndex].children.Contains(grid[(rowIndex + 1), colIndex]))
+                grid[rowIndex, colIndex].children.Add(grid[rowIndex + 1, colIndex]);
         }
     }
 
