@@ -13,9 +13,12 @@ public class EnemyAgent : MonoBehaviour
     public float ShootDistance;
     public float hitDistance;
 
+    // Behaviour block Set
+    public Block[] enemyBlockSet;
+
     // Game data container to use the BehviourBlocks
     Dictionary<string, float> gameData; // keys: playerDetected, health, maxHealth, allyNum, ammo, maxAmmo, distanceToPlayer, safeDistance, AttackDistance, hitDistance, shootDistance
-    
+
     // Variables used to check the state of the game 
     bool playerDetected;
     float ammo;
@@ -39,19 +42,10 @@ public class EnemyAgent : MonoBehaviour
 
         // Initializing the game data structure
         gameData = new Dictionary<string, float>();
-        
+
         // Creating the Decision Tree
         treeGenerator = new BehaviourBlockGeneration();
-        
-        treeGenerator.blockSet = new Block[4];
-        treeGenerator.blockSet[0].type = BlockType.Retreat;
-        treeGenerator.blockSet[0].weight = 4;
-        treeGenerator.blockSet[1].type = BlockType.StrategicPos;
-        treeGenerator.blockSet[1].weight = 1;
-        treeGenerator.blockSet[2].type = BlockType.GetClose;
-        treeGenerator.blockSet[2].weight = 4;
-        treeGenerator.blockSet[3].type = BlockType.Attack;
-        treeGenerator.blockSet[3].weight = 2;
+        treeGenerator.blockSet = enemyBlockSet;
 
         while (rootBlock == null)
         {
@@ -60,19 +54,26 @@ public class EnemyAgent : MonoBehaviour
                 treeGenerator.ClearTree();
         }
         currentBlock = rootBlock;
-        DebugArbol(currentBlock);
+
+        //DebugArbol(currentBlock); // Method that shows the tree blocks
     }
 
-    private void DebugArbol(BehaviourBlock block)
+    private void DebugArbol()
     {
-        if (block == null)
-            return;
-        Debug.Log("Bloque actual: " + block + "; Hijo 1: " + block.children[0] + "; Hijo 2: " + block.children[1]);
-        Debug.Log("Num Hijos: " + block.children.Count);
-        for (int i = 0; i < block.children.Count; i++)
+        Queue<BehaviourBlock> visited = new Queue<BehaviourBlock>();
+
+        while (currentBlock != null)
         {
-            Debug.Log("Hijo " + i + ": " + block.children[i]);
-            DebugArbol(block.children[i]);
+            Debug.Log("Bloque actual: " + currentBlock + "; num hijos: " + currentBlock.children.Count);
+            for (int i = 0; i < currentBlock.children.Count; i++)
+            {
+                visited.Enqueue(currentBlock.children[i]);
+            }
+
+            if (visited.Count > 0)
+                currentBlock = visited.Dequeue();
+            else
+                currentBlock = null;
         }
     }
 

@@ -115,7 +115,6 @@ public class BehaviourBlockGeneration
         {
             treeCleared = false;
             Initialize();
-            var nextCell = SearchNextGridCell();
             BlockElection(0, 0);
 
             //Generate behaviour blocks children
@@ -132,8 +131,7 @@ public class BehaviourBlockGeneration
 
     private void GenerateBehaviourBlocksChildren(IAVariable currentVariable)
     {
-        Debug.Log("Generando arbol, variable actual: " + currentVariable.blockChoosen);
-        if (currentVariable == null)
+        if (currentVariable.blockChoosen == null)
             return;
 
         currentVariable.blockChoosen.SetChildren(currentVariable.children);
@@ -194,7 +192,7 @@ public class BehaviourBlockGeneration
                     }
                 }
             }
-            else
+            else if(grid[rowIndex, colIndex].domainCount > 1)
             {
                 Block[] availableBlocks = new Block[grid[rowIndex, colIndex].domainCount];
                 int j = 0;
@@ -230,7 +228,6 @@ public class BehaviourBlockGeneration
                 grid[rowIndex, colIndex].children.Add(grid[(rowIndex + 1), colIndex]);
         }
 
-        Debug.Log("Bloque establecido: " + grid[rowIndex, colIndex].blockChoosen + "; hijos: " + grid[rowIndex, colIndex].children.Count);
         int[] nextGridCell = SearchNextGridCell();
         if (nextGridCell[0] != -1 && nextGridCell[1] != -1)
             BlockElection(nextGridCell[0], nextGridCell[1]);
