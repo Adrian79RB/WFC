@@ -73,6 +73,8 @@ public class EnemyAgent : MonoBehaviour
         ammo = maxAmmo;
         health = maxHealth;
         allies = FindObjectsOfType<EnemyAgent>();
+        homeWaypoint = GameObject.Find("homeWaypoint").transform;
+        player = GameObject.FindGameObjectWithTag("Player");
 
         // Initializing the game data structure
         gameData = new Dictionary<string, float>();
