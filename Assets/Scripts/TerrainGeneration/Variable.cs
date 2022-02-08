@@ -13,6 +13,7 @@ public class Variable : ScriptableObject
     public int[,] rotVisited;
     public int rotDirection = 0;
     public float entropy;
+    public GameObject tileReference;
 
     public void SetVariable(int size)
     {
@@ -48,7 +49,7 @@ public class Variable : ScriptableObject
             }
         }
 
-        Instantiate(tile.gameObject, position, tileChosen.transform.rotation, parent);
+        tileReference = Instantiate(tile.gameObject, position, tileChosen.transform.rotation, parent);
     }
 
     public void CalculateEntropy(Tile[] tileSet)

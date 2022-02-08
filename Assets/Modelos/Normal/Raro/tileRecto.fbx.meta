@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: b24c77cc727c91a49b214f13ba68f83c
+guid: b5ca081834b04a14b9ad7c05126d733b
 ModelImporter:
   serializedVersion: 21100
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tileRecto
+    second: {fileID: 2800000, guid: fe776c2f7fdf7934598e69c2931f8f23, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0

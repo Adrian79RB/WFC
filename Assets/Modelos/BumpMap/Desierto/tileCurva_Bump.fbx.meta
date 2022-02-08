@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: 08dbe2939f6948e4ba43f99e5f296bc8
+guid: f8b24bb8de98dfa499ed075c5b566444
 ModelImporter:
   serializedVersion: 21100
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tileCurva
+    second: {fileID: 2800000, guid: 1ea9b1c9bbce3194f93c3c04460efdd3, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0

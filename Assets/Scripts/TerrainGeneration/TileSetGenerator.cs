@@ -14,6 +14,10 @@ public struct Tile
 
 public class TileSetGenerator : MonoBehaviour
 {
+    [Header("Game manager reference")]
+    public GameManager gm;
+
+    [Header("Terrain building variables")]
     public int numCol;
     public int numRow;
     public int maxSteps;
@@ -22,9 +26,12 @@ public class TileSetGenerator : MonoBehaviour
     public NavMeshSurface surface;
     [HideInInspector] public Variable[,] grid;
 
+    // Variables used to instantiate the Tiles
     Vector3 originalPos;
     Vector3 currentPos;
-    bool gridCleared = false;
+    bool gridCleared = true;
+
+    // Variables used to handle with a predefined path inside the grid
     bool preDefinedPath = false;
     int[,] predefinedPathCoor;
 
@@ -72,6 +79,7 @@ public class TileSetGenerator : MonoBehaviour
                 grid[coor[0], coor[1]].domainCount = 1;
                 grid[coor[0], coor[1]].tileChosen = tileSet[choosenTile].tile;
                 grid[coor[0], coor[1]].CalculateEntropy(tileSet);
+                grid[coor[0], coor[1]].tileReference = transform.GetChild(i).gameObject;
             }
         }
         else

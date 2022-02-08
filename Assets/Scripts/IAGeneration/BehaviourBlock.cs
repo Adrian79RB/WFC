@@ -67,7 +67,7 @@ public class Retreat : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["health"] < gameData["maxHealth"] / 3 || gameData["allyNum"] < 5f || gameData["ammo"] < gameData["maxAmmo"] / 3;
+        return gameData["playerDetected"] == 1f && (gameData["health"] < gameData["maxHealth"] / 3 || gameData["allyNum"] < 5f || gameData["ammo"] < gameData["maxAmmo"] / 3);
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
@@ -91,7 +91,7 @@ public class StrategicPositioning : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["distanceToPlayer"] > gameData["safeDistance"];
+        return gameData["playerDetected"] == 1f && gameData["distanceToPlayer"] > gameData["safeDistance"];
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
@@ -114,7 +114,7 @@ public class GetClose : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["distanceToPlayer"] < gameData["AttackDistance"];
+        return gameData["playerDetected"] == 1f && gameData["distanceToPlayer"] < gameData["AttackDistance"];
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
@@ -137,7 +137,7 @@ public class GetAway : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["distanceToPlayer"] < gameData["AttackDistance"];
+        return gameData["playerDetected"] == 1f && gameData["distanceToPlayer"] < gameData["AttackDistance"];
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
@@ -160,7 +160,7 @@ public class Attack : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["DistanceToPlayer"] < gameData["hitDistance"];
+        return gameData["playerDetected"] == 1f && gameData["DistanceToPlayer"] < gameData["hitDistance"];
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
@@ -183,7 +183,7 @@ public class Shoot : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["DistanceToPlayer"] > gameData["shootDistance"];
+        return gameData["playerDetected"] == 1f && gameData["DistanceToPlayer"] > gameData["shootDistance"];
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)

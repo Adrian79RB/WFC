@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: f0fc640c54ae1a746a1a34ea89b06b35
+guid: df7cbe4e062152d49b353e2134c28d3d
 ModelImporter:
   serializedVersion: 21100
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: tileBasico
+    second: {fileID: 2800000, guid: 78fc3bf340dc9de4fb46f2c29f63e11a, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
