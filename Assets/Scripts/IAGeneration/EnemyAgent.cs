@@ -32,7 +32,7 @@ public class EnemyAgent : MonoBehaviour
     public GameObject arrow;
     public Transform[] waypoints;
     public Transform[] homePositions;
-    public List<Transform> strategicalPosition; //TODO: Falta implementar como obtenemos las posiciones del mapa
+    public List<Vector3> strategicalPosition; //TODO: Falta implementar como obtenemos las posiciones del mapa
 
 
     // Game data container to use the BehviourBlocks
@@ -64,7 +64,9 @@ public class EnemyAgent : MonoBehaviour
     BehaviourBlock rootBlock;
     BehaviourBlock currentBlock;
 
-    // Dictionary Update
+    // Tiles Grid to search the strategical positions
+    TileSetGenerator tileGenerator;
+    Variable[,] tilesGrid;
 
     void Start()
     {
@@ -75,6 +77,8 @@ public class EnemyAgent : MonoBehaviour
         allies = FindObjectsOfType<EnemyAgent>();
         homeWaypoint = GameObject.Find("homeWaypoint").transform;
         player = GameObject.FindGameObjectWithTag("Player");
+        tileGenerator = FindObjectOfType<TileSetGenerator>();
+        tilesGrid = tileGenerator.grid;
 
         // Initializing the game data structure
         gameData = new Dictionary<string, float>();
@@ -90,6 +94,8 @@ public class EnemyAgent : MonoBehaviour
                 treeGenerator.ClearTree();
         }
         currentBlock = rootBlock;
+
+        GetStrategicalPositions();
 
         //DebugArbol(currentBlock); // Method that shows the tree blocks
     }
@@ -107,6 +113,48 @@ public class EnemyAgent : MonoBehaviour
             }
 
             currentBlock = visited.Dequeue();
+        }
+    }
+
+    /// <summary>
+    /// This method is needed to find the positions near to cover in the procedural generated environment
+    /// </summary>
+    private void GetStrategicalPositions()
+    {
+        // Search trhough all the tiles grid
+        for (int i = 0; i < tilesGrid.GetLength(0); i++)
+        {
+            for (int j = 0; j < tilesGrid.GetLength(1); j++)
+            {
+                if (tilesGrid[i, j].tileChosen.name.Contains("Cover")) // Checking that the current tile is a cover
+                {
+                    // Checking that the neighbour tiles are not covers, and they are inside the grid
+                    if ((i - 1) > 0 && !tilesGrid[i - 1, j].tileChosen.name.Contains("Cover"))
+                    {
+                        var pos = new Vector3(j * tileGenerator.tileSize.x + tileGenerator.tileSize.x / 2, tileGenerator.tileSize.y / 2, (i - 1) * tileGenerator.tileSize.z + tileGenerator.tileSize.z / 2);
+                        if (!strategicalPosition.Contains(pos))
+                            strategicalPosition.Add(pos);
+                    }
+                    if ((i + 1) < (tilesGrid.GetLength(0) - 1) && !tilesGrid[i + 1, j].tileChosen.name.Contains("Cover"))
+                    {
+                        var pos = new Vector3(j * tileGenerator.tileSize.x + tileGenerator.tileSize.x / 2, tileGenerator.tileSize.y / 2, (i + 1) * tileGenerator.tileSize.z + tileGenerator.tileSize.z / 2);
+                        if (!strategicalPosition.Contains(pos))
+                            strategicalPosition.Add(pos);
+                    }
+                    if ((j - 1) > 0 && !tilesGrid[i, j - 1].tileChosen.name.Contains("Cover"))
+                    {
+                        var pos = new Vector3((j - 1) * tileGenerator.tileSize.x + tileGenerator.tileSize.x / 2, tileGenerator.tileSize.y / 2, i * tileGenerator.tileSize.z + tileGenerator.tileSize.z / 2);
+                        if (!strategicalPosition.Contains(pos))
+                            strategicalPosition.Add(pos);
+                    }
+                    if ((j + 1) < (tilesGrid.GetLength(1) - 1) && !tilesGrid[i, j + 1].tileChosen.name.Contains("Cover"))
+                    {
+                        var pos = new Vector3((j + 1) * tileGenerator.tileSize.x + tileGenerator.tileSize.x / 2, tileGenerator.tileSize.y / 2, i * tileGenerator.tileSize.z + tileGenerator.tileSize.z / 2);
+                        if (!strategicalPosition.Contains(pos))
+                            strategicalPosition.Add(pos);
+                    }
+                }
+            }
         }
     }
 
@@ -238,32 +286,33 @@ public class EnemyAgent : MonoBehaviour
             if (agent.isStopped)
                 agent.isStopped = false;
 
+            var nextPos = currentWaypoint.position;
             // Searching a strategical position in the arena
-            if (!strategicalPosition.Contains(currentWaypoint))
+            if (!strategicalPosition.Contains(nextPos))
             {
                 var bestDistance = Mathf.Infinity;
                 for (int i = 0; i < strategicalPosition.Count; i++)
                 {
-                    var distance = Vector3.Distance(strategicalPosition[i].position, player.transform.position);
+                    var distance = Vector3.Distance(strategicalPosition[i], player.transform.position);
                     if(distance > safeDistance && distance < bestDistance)
                     {
-                        currentWaypoint = strategicalPosition[i];
+                        nextPos = strategicalPosition[i];
                         bestDistance = distance;
                     }
                 }
             }
 
-            agent.Move(currentWaypoint.position);
+            agent.Move(nextPos);
 
             // Waiting the player to arrive
-            if (Vector3.Distance(transform.position, currentWaypoint.position) < agent.stoppingDistance)
+            if (Vector3.Distance(transform.position, nextPos) < agent.stoppingDistance)
             {
                 agent.isStopped = true;
                 strategicallyHide = true;
                 RotateEnemy(player.transform.position);
             }
             else
-                RotateEnemy(currentWaypoint.position);
+                RotateEnemy(nextPos);
         }
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 
 [System.Serializable]
@@ -18,8 +19,9 @@ public class TileSetGenerator : MonoBehaviour
     public int maxSteps;
     public Vector3 tileSize;
     public Tile[] tileSet;
+    public NavMeshSurface surface;
+    [HideInInspector] public Variable[,] grid;
 
-    Variable[,] grid;
     Vector3 originalPos;
     Vector3 currentPos;
     bool gridCleared = false;
@@ -133,6 +135,8 @@ public class TileSetGenerator : MonoBehaviour
                 var firstCell = SearchNextGridCell();
                 TileElection(firstCell[0], firstCell[1]);
             }
+
+            surface.BuildNavMesh();
         }
         else
         {
