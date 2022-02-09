@@ -67,6 +67,7 @@ public class Retreat : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
+        Debug.Log("I am " + this.ToString() + "; player detected: " + gameData["playerDetected"] + "; health: " + gameData["health"] + "; ally number: " + gameData["allyNum"] + "; ammo: " + gameData["ammo"]);
         return gameData["playerDetected"] == 1f && (gameData["health"] < gameData["maxHealth"] / 3 || gameData["allyNum"] < 5f || gameData["ammo"] < gameData["maxAmmo"] / 3);
     }
 
@@ -91,6 +92,7 @@ public class StrategicPositioning : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
+        Debug.Log("I am " + this.ToString() + "; player detected: " + gameData["playerDetected"] + "; distance to player: " + gameData["distanceToPlayer"] + "; safe distance: " + gameData["safeDistance"]);
         return gameData["playerDetected"] == 1f && gameData["distanceToPlayer"] > gameData["safeDistance"];
     }
 
@@ -114,6 +116,7 @@ public class GetClose : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
+        Debug.Log("I am " + this.ToString() + "; player detected: " + gameData["playerDetected"] + "; distance to player: " + gameData["distanceToPlayer"] + "; attack distance: " + gameData["AttackDistance"]);
         return gameData["playerDetected"] == 1f && gameData["distanceToPlayer"] < gameData["AttackDistance"];
     }
 
@@ -160,7 +163,7 @@ public class Attack : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["playerDetected"] == 1f && gameData["DistanceToPlayer"] < gameData["hitDistance"];
+        return gameData["playerDetected"] == 1f && gameData["distanceToPlayer"] < gameData["hitDistance"];
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)

@@ -40,7 +40,7 @@ public class EnemyAgent : MonoBehaviour
                                         // safeDistance, AttackDistance, hitDistance, shootDistance}
 
     // Variables used to check the state of the game 
-    bool playerDetected;
+    public bool playerDetected;
     float ammo;
     float health;
     EnemyAgent[] allies;
@@ -63,7 +63,6 @@ public class EnemyAgent : MonoBehaviour
     BehaviourBlockGeneration treeGenerator;
     BehaviourBlock rootBlock;
     BehaviourBlock currentBlock;
-    bool inExecution;
 
     // Tiles Grid to search the strategical positions
     Transform tileMap;
@@ -187,7 +186,7 @@ public class EnemyAgent : MonoBehaviour
         currentBlock = currentBlock.Run(this, gameData);
 
         // Restarting some behaviour variables
-        if (currentBlock.GetType().ToString() != "RetreatToHome" && retreating)
+        if (currentBlock.ToString() != "Retreat" && retreating)
             retreating = false;
         else if (currentBlock.GetType().ToString() != "SearchStrategicPos" && strategicallyHide)
             strategicallyHide = false;
@@ -198,7 +197,7 @@ public class EnemyAgent : MonoBehaviour
         // Calculate the rotation to face the player
         Vector3 playerDirection = (targetPos - transform.position).normalized;
         Quaternion rot = Quaternion.FromToRotation(transform.forward, playerDirection);
-        transform.rotation = Quaternion.Slerp(transform.rotation, rot, agent.angularSpeed);
+        transform.rotation = Quaternion.Lerp(transform.rotation, rot, 0.8f);
     }
 
     /// <summary>
@@ -207,8 +206,8 @@ public class EnemyAgent : MonoBehaviour
     public void GoPatrolling()
     {
         if (!playerDetected)
-        {            
-            if (currentWaypoint == null) 
+        {
+            if (currentWaypoint == null)
             {
                 waypointIndex = 0;
                 currentWaypoint = waypoints[waypointIndex];
@@ -224,7 +223,7 @@ public class EnemyAgent : MonoBehaviour
                     waypointIndex++;
                     if (waypointIndex >= waypoints.Length)
                         waypointIndex = 0;
-                    
+
                     currentWaypoint = waypoints[waypointIndex];
                 }
                 else
@@ -233,7 +232,7 @@ public class EnemyAgent : MonoBehaviour
             else if (agent.isStopped)// Waiting time until start patrolling again
             {
                 waitTimer -= Time.deltaTime;
-                if(waitTimer <= 0f)
+                if (waitTimer <= 0f)
                 {
                     waitTimer = 5.0f;
                     agent.isStopped = false;
@@ -248,14 +247,16 @@ public class EnemyAgent : MonoBehaviour
     internal void RetreatToHome()
     {
         Debug.Log("Retreating");
-        if (!inExecution)
-            inExecution = true;
 
         // Going to the Fortificate position in the arena
         if(currentWaypoint != homeWaypoint && !retreating)
         {
+            if (agent.isStopped)
+                agent.isStopped = false;
+
             currentWaypoint = homeWaypoint;
             retreating = true;
+            Debug.Log("Going home: " + currentWaypoint.position);
         }
 
         // Selecting an Strategical position in the fortificate area
@@ -273,6 +274,8 @@ public class EnemyAgent : MonoBehaviour
                         furthestPosition = distance;
                     }
                 }
+
+                Debug.Log("Searching furthest Point: " + currentWaypoint.position);
             }
             else
             {
@@ -286,19 +289,26 @@ public class EnemyAgent : MonoBehaviour
                         closestPosition = distance;
                     }
                 }
+
+                Debug.Log("Searching closest Point: " + currentWaypoint.position);
             }
         }
 
         agent.SetDestination(currentWaypoint.position);
+        Debug.Log("Moving to " + currentWaypoint.position);
 
         // Waiting for the player to arrive
         if (currentWaypoint != homeWaypoint && Vector3.Distance(transform.position, currentWaypoint.position) < agent.stoppingDistance)
         {
+            Debug.Log("Stopping " + currentWaypoint.position);
             agent.isStopped = true;
             RotateEnemy(player.transform.position);
         }
         else
-            RotateEnemy(currentWaypoint.position);
+        {
+            //RotateEnemy(currentWaypoint.position);
+            Debug.Log("Rotating the enemy");
+        }
     }
 
     /// <summary>
@@ -314,6 +324,7 @@ public class EnemyAgent : MonoBehaviour
                 agent.isStopped = false;
 
             var nextPos = currentWaypoint.position;
+            Debug.Log("Current Next Pos: " + nextPos);
             // Searching a strategical position in the arena
             if (!strategicalPosition.Contains(nextPos))
             {
@@ -327,6 +338,7 @@ public class EnemyAgent : MonoBehaviour
                         bestDistance = distance;
                     }
                 }
+                Debug.Log("Last Pos not strategical; new next pos: " + nextPos);
             }
 
             agent.SetDestination(nextPos);
@@ -334,12 +346,15 @@ public class EnemyAgent : MonoBehaviour
             // Waiting the player to arrive
             if (Vector3.Distance(transform.position, nextPos) < agent.stoppingDistance)
             {
+                Debug.Log("Waiting for player");
                 agent.isStopped = true;
                 strategicallyHide = true;
                 RotateEnemy(player.transform.position);
             }
-            else
-                RotateEnemy(nextPos);
+            else {
+                //RotateEnemy(nextPos);
+                Debug.Log("Rotating the enemy");
+            }
         }
     }
 
@@ -349,7 +364,6 @@ public class EnemyAgent : MonoBehaviour
     internal void GetCloseToPlayer()
     {
         Debug.Log("Getting Close");
-
 
         float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
         Vector3 futurePlayerPosition = player.transform.position + player.GetComponent<Rigidbody>().velocity * time; // Future position of the player in that time
