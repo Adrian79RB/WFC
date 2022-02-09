@@ -27,11 +27,12 @@ public class EnemyAgent : MonoBehaviour
     // Enemy Functional stuff
     [Header("Enemy Functionality stuff")]
     public bool isBlocking;
+    public float shootForce;
     public NavMeshAgent agent;
     public Transform shootPos;
     public GameObject arrow;
     public Transform[] waypoints;
-    public Transform[] homePositions;
+    public List<Transform> homePositions;
     public List<Vector3> strategicalPosition; //TODO: Falta implementar como obtenemos las posiciones del mapa
 
 
@@ -54,6 +55,8 @@ public class EnemyAgent : MonoBehaviour
     Transform homeWaypoint;
     bool retreating = false;
     bool strategicallyHide = false;
+    float shootCoolDown = 3.0f;
+    bool reloading = false;
 
     // Variables that check the gameData Update
     float gameDataUpdateTimer = 5.0f;
@@ -188,7 +191,7 @@ public class EnemyAgent : MonoBehaviour
         // Restarting some behaviour variables
         if (currentBlock.ToString() != "Retreat" && retreating)
             retreating = false;
-        else if (currentBlock.GetType().ToString() != "SearchStrategicPos" && strategicallyHide)
+        else if (currentBlock.ToString() != "StrategicPositioning" && strategicallyHide)
             strategicallyHide = false;
     }
 
@@ -196,7 +199,7 @@ public class EnemyAgent : MonoBehaviour
     {
         // Calculate the rotation to face the player
         Vector3 playerDirection = (targetPos - transform.position).normalized;
-        Quaternion rot = Quaternion.FromToRotation(transform.forward, playerDirection);
+        Quaternion rot = Quaternion.LookRotation(playerDirection, transform.up);
         transform.rotation = Quaternion.Lerp(transform.rotation, rot, 0.8f);
     }
 
@@ -246,8 +249,6 @@ public class EnemyAgent : MonoBehaviour
     /// </summary>
     internal void RetreatToHome()
     {
-        Debug.Log("Retreating");
-
         // Going to the Fortificate position in the arena
         if(currentWaypoint != homeWaypoint && !retreating)
         {
@@ -256,16 +257,15 @@ public class EnemyAgent : MonoBehaviour
 
             currentWaypoint = homeWaypoint;
             retreating = true;
-            Debug.Log("Going home: " + currentWaypoint.position);
         }
 
         // Selecting an Strategical position in the fortificate area
-        if (Vector3.Distance(transform.position, homeWaypoint.position) < agent.stoppingDistance)
+        if (!homePositions.Contains(currentWaypoint) && Vector3.Distance(transform.position, homeWaypoint.position) < agent.stoppingDistance)
         {
             if (type == EnemyType.Archer)
             {
                 var furthestPosition = -Mathf.Infinity;
-                for (int i = 0; i < homePositions.Length; i++)
+                for (int i = 0; i < homePositions.Count; i++)
                 {
                     var distance = Vector3.Distance(homePositions[i].position, player.transform.position);
                     if (distance > furthestPosition)
@@ -274,13 +274,11 @@ public class EnemyAgent : MonoBehaviour
                         furthestPosition = distance;
                     }
                 }
-
-                Debug.Log("Searching furthest Point: " + currentWaypoint.position);
             }
             else
             {
                 var closestPosition = Mathf.Infinity;
-                for (int i = 0; i < homePositions.Length; i++)
+                for (int i = 0; i < homePositions.Count; i++)
                 {
                     var distance = Vector3.Distance(homePositions[i].position, player.transform.position);
                     if (distance < closestPosition)
@@ -289,25 +287,16 @@ public class EnemyAgent : MonoBehaviour
                         closestPosition = distance;
                     }
                 }
-
-                Debug.Log("Searching closest Point: " + currentWaypoint.position);
             }
         }
 
         agent.SetDestination(currentWaypoint.position);
-        Debug.Log("Moving to " + currentWaypoint.position);
 
         // Waiting for the player to arrive
         if (currentWaypoint != homeWaypoint && Vector3.Distance(transform.position, currentWaypoint.position) < agent.stoppingDistance)
         {
-            Debug.Log("Stopping " + currentWaypoint.position);
             agent.isStopped = true;
             RotateEnemy(player.transform.position);
-        }
-        else
-        {
-            //RotateEnemy(currentWaypoint.position);
-            Debug.Log("Rotating the enemy");
         }
     }
 
@@ -316,17 +305,14 @@ public class EnemyAgent : MonoBehaviour
     /// </summary>
     internal void SearchStrategicPos()
     {
-        Debug.Log("Searching Pos");
-
         if (!strategicallyHide)
         {
             if (agent.isStopped)
                 agent.isStopped = false;
 
             var nextPos = currentWaypoint.position;
-            Debug.Log("Current Next Pos: " + nextPos);
             // Searching a strategical position in the arena
-            if (!strategicalPosition.Contains(nextPos))
+            if (!strategicalPosition.Contains(agent.destination))
             {
                 var bestDistance = Mathf.Infinity;
                 for (int i = 0; i < strategicalPosition.Count; i++)
@@ -338,7 +324,6 @@ public class EnemyAgent : MonoBehaviour
                         bestDistance = distance;
                     }
                 }
-                Debug.Log("Last Pos not strategical; new next pos: " + nextPos);
             }
 
             agent.SetDestination(nextPos);
@@ -346,16 +331,13 @@ public class EnemyAgent : MonoBehaviour
             // Waiting the player to arrive
             if (Vector3.Distance(transform.position, nextPos) < agent.stoppingDistance)
             {
-                Debug.Log("Waiting for player");
                 agent.isStopped = true;
                 strategicallyHide = true;
-                RotateEnemy(player.transform.position);
-            }
-            else {
-                //RotateEnemy(nextPos);
-                Debug.Log("Rotating the enemy");
             }
         }
+        else
+            RotateEnemy(player.transform.position);
+
     }
 
     /// <summary>
@@ -363,7 +345,8 @@ public class EnemyAgent : MonoBehaviour
     /// </summary>
     internal void GetCloseToPlayer()
     {
-        Debug.Log("Getting Close");
+        if (agent.isStopped)
+            agent.isStopped = false;
 
         float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
         Vector3 futurePlayerPosition = player.transform.position + player.GetComponent<Rigidbody>().velocity * time; // Future position of the player in that time
@@ -375,10 +358,7 @@ public class EnemyAgent : MonoBehaviour
         if (Vector3.Distance(transform.position, futurePlayerPosition) >= gameData["distanceToPlayer"])
         {
             agent.SetDestination(player.transform.position);
-            RotateEnemy(player.transform.position);
         }
-        else
-            RotateEnemy(futurePlayerPosition);
     }
 
     /// <summary>
@@ -393,20 +373,17 @@ public class EnemyAgent : MonoBehaviour
 
         Vector3 direction = (futurePlayerPosition - transform.position).normalized; // Get the opposite direction to the player
         Vector3 targetPos = -direction * ShootDistance; // Calculate an appropriate position to shoot to the player
-        
+
+        Debug.Log("Posicion real: " + targetPos + "; posición original: " + futurePlayerPosition);
         agent.SetDestination(targetPos);
-        RotateEnemy(targetPos);
     }
 
     internal void Attack()
     {
-        Debug.Log("Attacking");
-
         if (gameData["distanceToPlayer"] > hitDistance) // Get to hit distance of the player 
         {
             currentWaypoint = player.transform;
             agent.SetDestination(currentWaypoint.position);
-            RotateEnemy(currentWaypoint.position);
         }
         else
         {
@@ -434,10 +411,23 @@ public class EnemyAgent : MonoBehaviour
 
         // Check if there is enought ammo to shoot and the player is visible to shoot them
         RaycastHit hit;
-        if(ammo > 0 && Physics.Raycast(shootPos.position, playerDirection, out hit, ShootDistance) && hit.transform.tag == "Player")
+        Debug.Log("Va a disparar");
+        if (!reloading && ammo > 0 && Physics.Raycast(shootPos.position, playerDirection, out hit, ShootDistance) && hit.transform.tag == "Player")
         {
-            Instantiate(arrow, shootPos.position, shootPos.rotation, shootPos);
+            Debug.Log("Flecha creada");
+            Rigidbody rgbdArrow = Instantiate(arrow, shootPos.position, shootPos.rotation, shootPos).GetComponent<Rigidbody>();
+            rgbdArrow.AddForce(playerDirection, ForceMode.Impulse);
+            reloading = true;
             ammo--;
+        }
+        else if (reloading)
+        {
+            shootCoolDown -= Time.deltaTime;
+            if (shootCoolDown < 0)
+            {
+                reloading = false;
+                shootCoolDown = 3.0f;
+            }
         }
     }
 
