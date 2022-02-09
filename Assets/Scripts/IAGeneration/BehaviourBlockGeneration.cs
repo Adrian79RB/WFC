@@ -194,6 +194,15 @@ public class BehaviourBlockGeneration
             }
             else if(grid[rowIndex, colIndex].domainCount > 1)
             {
+                Debug.Log("Dominio count: " + grid[rowIndex, colIndex].domainCount);
+                for (int i = 0; i < grid[rowIndex, colIndex].domain.Length; i++)
+                {
+                    if (grid[rowIndex, colIndex].domain[i])
+                        Debug.Log("Active: " + blockSet[i].type.ToString());
+                    else
+                        Debug.Log("Inactive: " + blockSet[i].type.ToString());
+                }
+
                 Block[] availableBlocks = new Block[grid[rowIndex, colIndex].domainCount];
                 int j = 0;
                 for (int i = 0; i < grid[rowIndex, colIndex].domain.Length; i++)

@@ -101,7 +101,7 @@ public class EnemyAgent : MonoBehaviour
 
         GetStrategicalPositions();
 
-        DebugArbol(); // Method that shows the tree blocks
+        //DebugArbol(); // Method that shows the tree blocks
     }
 
     private void DebugArbol()
@@ -206,28 +206,31 @@ public class EnemyAgent : MonoBehaviour
     /// </summary>
     public void GoPatrolling()
     {
-        Debug.Log("Patrolling");
         if (!playerDetected)
-        {
+        {            
             if (currentWaypoint == null) 
             {
                 waypointIndex = 0;
                 currentWaypoint = waypoints[waypointIndex];
             }
-            // Moving among the patrol waypoints
-            if(Vector3.Distance(currentWaypoint.position, transform.position) < agent.stoppingDistance)
-            {
-                if (waypointIndex >= waypoints.Length)
-                    waypointIndex = 0;
 
+            agent.SetDestination(currentWaypoint.position);
+
+            // Moving among the patrol waypoints
+            if (!agent.isStopped && Vector3.Distance(currentWaypoint.position, transform.position) < agent.stoppingDistance)
+            {
                 if (UnityEngine.Random.value > 0.2f)
+                {
+                    waypointIndex++;
+                    if (waypointIndex >= waypoints.Length)
+                        waypointIndex = 0;
+                    
                     currentWaypoint = waypoints[waypointIndex];
+                }
                 else
                     agent.isStopped = true;
             }
-
-            // Waiting time until start patrolling again
-            if (agent.isStopped)
+            else if (agent.isStopped)// Waiting time until start patrolling again
             {
                 waitTimer -= Time.deltaTime;
                 if(waitTimer <= 0f)
@@ -235,10 +238,6 @@ public class EnemyAgent : MonoBehaviour
                     waitTimer = 5.0f;
                     agent.isStopped = false;
                 }
-            }
-            else 
-            {
-                agent.Move(currentWaypoint.position);
             }
         }
     }
@@ -290,7 +289,7 @@ public class EnemyAgent : MonoBehaviour
             }
         }
 
-        agent.Move(currentWaypoint.position);
+        agent.SetDestination(currentWaypoint.position);
 
         // Waiting for the player to arrive
         if (currentWaypoint != homeWaypoint && Vector3.Distance(transform.position, currentWaypoint.position) < agent.stoppingDistance)
@@ -330,7 +329,7 @@ public class EnemyAgent : MonoBehaviour
                 }
             }
 
-            agent.Move(nextPos);
+            agent.SetDestination(nextPos);
 
             // Waiting the player to arrive
             if (Vector3.Distance(transform.position, nextPos) < agent.stoppingDistance)
@@ -355,13 +354,13 @@ public class EnemyAgent : MonoBehaviour
         float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
         Vector3 futurePlayerPosition = player.transform.position + player.GetComponent<Rigidbody>().velocity * time; // Future position of the player in that time
 
-        agent.Move(futurePlayerPosition);
+        agent.SetDestination(futurePlayerPosition);
 
 
         // If the enemy is close enought go for the player
         if (Vector3.Distance(transform.position, futurePlayerPosition) >= gameData["distanceToPlayer"])
         {
-            agent.Move(player.transform.position);
+            agent.SetDestination(player.transform.position);
             RotateEnemy(player.transform.position);
         }
         else
@@ -381,7 +380,7 @@ public class EnemyAgent : MonoBehaviour
         Vector3 direction = (futurePlayerPosition - transform.position).normalized; // Get the opposite direction to the player
         Vector3 targetPos = -direction * ShootDistance; // Calculate an appropriate position to shoot to the player
         
-        agent.Move(targetPos);
+        agent.SetDestination(targetPos);
         RotateEnemy(targetPos);
     }
 
@@ -392,7 +391,7 @@ public class EnemyAgent : MonoBehaviour
         if (gameData["distanceToPlayer"] > hitDistance) // Get to hit distance of the player 
         {
             currentWaypoint = player.transform;
-            agent.Move(currentWaypoint.position);
+            agent.SetDestination(currentWaypoint.position);
             RotateEnemy(currentWaypoint.position);
         }
         else
