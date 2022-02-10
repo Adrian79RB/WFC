@@ -79,7 +79,7 @@ public class EnemyAgent : MonoBehaviour
         health = maxHealth;
         allies = FindObjectsOfType<EnemyAgent>();
         homeWaypoint = GameObject.Find("homeWaypoint").transform;
-        player = GameObject.FindGameObjectWithTag("Player");
+        player = GameObject.Find("Player");
 
         tileMap = GameObject.Find("TilesGenerator").transform;
         gameObjectGrid = new GameObject[tileMap.GetComponent<TileSetGenerator>().numRow, tileMap.GetComponent<TileSetGenerator>().numCol];
@@ -349,7 +349,7 @@ public class EnemyAgent : MonoBehaviour
             agent.isStopped = false;
 
         float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
-        Vector3 futurePlayerPosition = player.transform.position + player.GetComponent<Rigidbody>().velocity * time; // Future position of the player in that time
+        Vector3 futurePlayerPosition = player.transform.position + player.transform.forward * player.GetComponent<Player>().movementSpeed * time; // Future position of the player in that time
 
         agent.SetDestination(futurePlayerPosition);
 
@@ -369,7 +369,7 @@ public class EnemyAgent : MonoBehaviour
         Debug.Log("Getting away");
 
         float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
-        Vector3 futurePlayerPosition = player.transform.position + player.GetComponent<Rigidbody>().velocity * time; // Future position of the player in that time
+        Vector3 futurePlayerPosition = player.transform.position + player.transform.forward * player.GetComponent<Player>().movementSpeed * time; // Future position of the player in that time
 
         Vector3 direction = (futurePlayerPosition - transform.position).normalized; // Get the opposite direction to the player
         Vector3 targetPos = -direction * ShootDistance; // Calculate an appropriate position to shoot to the player
@@ -416,7 +416,7 @@ public class EnemyAgent : MonoBehaviour
         {
             Debug.Log("Flecha creada");
             Rigidbody rgbdArrow = Instantiate(arrow, shootPos.position, shootPos.rotation, shootPos).GetComponent<Rigidbody>();
-            rgbdArrow.AddForce(playerDirection, ForceMode.Impulse);
+            rgbdArrow.AddForce(playerDirection * shootForce, ForceMode.Impulse);
             reloading = true;
             ammo--;
         }

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3129996854175896825}
   - component: {fileID: 9095443897170654412}
   - component: {fileID: 3356506972301405014}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: tileCover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -123,7 +123,6 @@ GameObject:
   - component: {fileID: 7984184698049956039}
   - component: {fileID: 8432404127657741456}
   - component: {fileID: 1545239596548181984}
-  - component: {fileID: 3780444583611774227}
   m_Layer: 0
   m_Name: Cylinder
   m_TagString: Untagged
@@ -139,8 +138,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7439187601706612543}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 12.4}
-  m_LocalScale: {x: 1, y: 10, z: 1}
+  m_LocalPosition: {x: 0, y: -0, z: 16.2}
+  m_LocalScale: {x: 1, y: 14, z: 1}
   m_Children: []
   m_Father: {fileID: 4261767897222836118}
   m_RootOrder: 0
@@ -208,19 +207,3 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.0000001, y: 2.0000002, z: 1.0000002}
   m_Center: {x: 0.000000059604645, y: -0.00000023841858, z: -0.00000008940697}
---- !u!208 &3780444583611774227
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7439187601706612543}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.5, y: 1, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5

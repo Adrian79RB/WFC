@@ -57,7 +57,7 @@ GameObject:
   - component: {fileID: 5306814133054236967}
   - component: {fileID: 1547126308531080064}
   - component: {fileID: 9122331004454749905}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cubo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -155,8 +155,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4025570574143589354}
   m_LocalRotation: {x: -0.5000001, y: -0.49999988, z: -0.4999999, w: 0.5000001}
-  m_LocalPosition: {x: -1, y: 0.657, z: -1}
-  m_LocalScale: {x: 168.88895, y: 168.88895, z: 50}
+  m_LocalPosition: {x: -1, y: 0.82, z: -1}
+  m_LocalScale: {x: 168.88895, y: 168.88895, z: 70}
   m_Children: []
   m_Father: {fileID: 800526551627705150}
   m_RootOrder: 0

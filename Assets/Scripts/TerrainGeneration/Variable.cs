@@ -55,12 +55,19 @@ public class Variable : ScriptableObject
     public void CalculateEntropy(Tile[] tileSet)
     {
         float auxiliar = 0f;
+        float maxWeight = 0f;
+
+        for (int i = 0; i < tileSet.Length; i++)
+        {
+            if (domain[i])
+                maxWeight += tileSet[i].weight;
+        }
 
         for(int i = 0; i < domain.Length; i++)
         {
             if (domain[i])
             {
-                auxiliar += tileSet[i].weight * Mathf.Log(tileSet[i].weight);
+                auxiliar += (tileSet[i].weight/maxWeight) * Mathf.Log((tileSet[i].weight/maxWeight));
             }
         }
 

@@ -23,7 +23,7 @@ public class Arrow : MonoBehaviour
         {
             // Causar daño;
         }
-
+        Debug.Log("Crash with " + collision.transform.name);
         Destroy(gameObject);
     }
 }
