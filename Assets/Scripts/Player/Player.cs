@@ -28,21 +28,32 @@ public class Player : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
-        Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * movementSpeed * Time.deltaTime);
-
-        // Jump method
-        if(Input.GetButtonDown("Jump") && isGrounded)
+        if (GetComponent<CharacterController>().enabled)
         {
-            velocity.y = Mathf.Sqrt(jumpHigh * -2f * gravity);
-        }
+            Vector3 move = transform.right * x + transform.forward * z;
+            controller.Move(move * movementSpeed * Time.deltaTime);
 
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+            // Jump method
+            if (Input.GetButtonDown("Jump") && isGrounded)
+            {
+                velocity.y = Mathf.Sqrt(jumpHigh * -2f * gravity);
+            }
+
+            velocity.y += gravity * Time.deltaTime;
+            controller.Move(velocity * Time.deltaTime);
+        }
     }
 
-    public void EnterPortal(Vector3 tpPosition)
+    public void PortalTeleport(Vector3 newPos)
     {
-        transform.position = tpPosition;
+        transform.position = newPos;
+        StartCoroutine("ActivateCharacterController");
+    }
+
+    IEnumerator ActivateCharacterController()
+    {
+        GetComponent<CharacterController>().enabled = false;
+        yield return new WaitForSeconds(1.0f);
+        GetComponent<CharacterController>().enabled = true;
     }
 }
