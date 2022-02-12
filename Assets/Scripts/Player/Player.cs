@@ -14,8 +14,18 @@ public class Player : MonoBehaviour
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
 
+    public float rayDistance;
+
     Vector3 velocity;
     bool isGrounded;
+    bool isInGenerationRoom;
+    Transform camera;
+
+    private void Start()
+    {
+        isInGenerationRoom = true;
+        camera = transform.Find("Main Camera");
+    }
 
     // Update is called once per frame
     void Update()
@@ -42,6 +52,15 @@ public class Player : MonoBehaviour
             velocity.y += gravity * Time.deltaTime;
             controller.Move(velocity * Time.deltaTime);
         }
+
+        if(isInGenerationRoom && Input.GetMouseButtonDown(0))
+        {
+            RaycastHit hit;
+            if(Physics.Raycast(camera.position, camera.forward, out hit, rayDistance, LayerMask.GetMask("InteractuableObject")))
+            {
+                hit.transform.GetComponent<ButtonScript>().ButtonPressed();
+            }
+        }
     }
 
     public void PortalTeleport(Vector3 newPos)
@@ -53,6 +72,7 @@ public class Player : MonoBehaviour
     IEnumerator ActivateCharacterController()
     {
         GetComponent<CharacterController>().enabled = false;
+        isInGenerationRoom = false;
         yield return new WaitForSeconds(1.0f);
         GetComponent<CharacterController>().enabled = true;
     }

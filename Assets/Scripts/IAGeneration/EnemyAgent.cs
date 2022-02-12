@@ -234,6 +234,11 @@ public class EnemyAgent : MonoBehaviour
             }
             else if (agent.isStopped)// Waiting time until start patrolling again
             {
+                if(waitTimer == 5.0f)
+                {
+                    Vector3 pos = transform.position + transform.forward * 20;
+                    RotateEnemy(pos);
+                }
                 waitTimer -= Time.deltaTime;
                 if (waitTimer <= 0f)
                 {
@@ -318,7 +323,7 @@ public class EnemyAgent : MonoBehaviour
                 for (int i = 0; i < strategicalPosition.Count; i++)
                 {
                     var distance = Vector3.Distance(strategicalPosition[i], player.transform.position);
-                    if(distance > safeDistance && distance < bestDistance)
+                    if (distance > safeDistance && distance < bestDistance)
                     {
                         nextPos = strategicalPosition[i];
                         bestDistance = distance;
@@ -336,7 +341,10 @@ public class EnemyAgent : MonoBehaviour
             }
         }
         else
-            RotateEnemy(player.transform.position);
+        {
+            var pos = new Vector3(player.transform.position.x, player.transform.position.y + .5f, player.transform.position.z);
+            RotateEnemy(pos);
+        }
 
     }
 
@@ -397,7 +405,8 @@ public class EnemyAgent : MonoBehaviour
                 isBlocking = true;
                 StartCoroutine("blockAnimation");
             }
-            RotateEnemy(player.transform.position);
+            var pos = new Vector3(player.transform.position.x, player.transform.position.y + .5f, player.transform.position.z);
+            RotateEnemy(pos);
         }
     }
 
@@ -406,8 +415,12 @@ public class EnemyAgent : MonoBehaviour
         Debug.Log("Shooting");
 
         // Calculate the rotation to face the player
-        RotateEnemy(player.transform.position);
-        Vector3 playerDirection = (player.transform.position - transform.position).normalized;
+        var pos = new Vector3(player.transform.position.x, player.transform.position.y + .5f, player.transform.position.z);
+        RotateEnemy(pos);
+
+        Vector3 playerDirection = player.transform.position - transform.position;
+        playerDirection.y += .5f;
+        playerDirection = playerDirection.normalized;
 
         // Check if there is enought ammo to shoot and the player is visible to shoot them
         RaycastHit hit;
