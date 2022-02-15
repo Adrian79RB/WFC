@@ -21,9 +21,11 @@ public class TileSetGenerator : MonoBehaviour
     public int numCol;
     public int numRow;
     public int maxSteps;
+    public bool terrainGenerated = false;
     public Vector3 tileSize;
     public Tile[] tileSet;
     public NavMeshSurface surface;
+    public Transform predefinedPath;
     [HideInInspector] public Variable[,] grid;
 
     // Variables used to instantiate the Tiles
@@ -52,20 +54,20 @@ public class TileSetGenerator : MonoBehaviour
         }
 
 
-        if (transform.childCount > 0)
+        if (transform.childCount > 0 && predefinedPath.gameObject.activeSelf)
         {
             preDefinedPath = true;
-            predefinedPathCoor = new int[transform.childCount, 2];
-            for (int i = 0; i < transform.childCount; i++)
+            predefinedPathCoor = new int[predefinedPath.childCount, 2];
+            for (int i = 0; i < predefinedPath.childCount; i++)
             {
-                int[] coor = { Mathf.FloorToInt(transform.GetChild(i).position.z), Mathf.FloorToInt(transform.GetChild(i).position.x) };
+                int[] coor = { Mathf.FloorToInt(predefinedPath.GetChild(i).position.z), Mathf.FloorToInt(predefinedPath.GetChild(i).position.x) };
                 predefinedPathCoor[i, 0] = coor[0];
                 predefinedPathCoor[i, 1] = coor[1];
                 int choosenTile = -1;
 
                 for (int k = 0; k < tileSet.Length; k++)
                 {
-                    if (transform.GetChild(i).name.StartsWith(tileSet[k].tile.transform.name))
+                    if (predefinedPath.GetChild(i).name.StartsWith(tileSet[k].tile.transform.name))
                         choosenTile = k;
                 }
 
@@ -79,7 +81,7 @@ public class TileSetGenerator : MonoBehaviour
                 grid[coor[0], coor[1]].domainCount = 1;
                 grid[coor[0], coor[1]].tileChosen = tileSet[choosenTile].tile;
                 grid[coor[0], coor[1]].CalculateEntropy(tileSet);
-                grid[coor[0], coor[1]].tileReference = transform.GetChild(i).gameObject;
+                grid[coor[0], coor[1]].tileReference = predefinedPath.GetChild(i).gameObject;
             }
         }
         else
@@ -93,16 +95,22 @@ public class TileSetGenerator : MonoBehaviour
     {
         if (!gridCleared)
         {
+            terrainGenerated = false;
             gridCleared = true;
             currentPos = originalPos;
 
             var count = transform.childCount;
             int i = 0;
 
-            while (i < count)
+            while (i < count && i < transform.childCount)
             {
-                DestroyImmediate(transform.GetChild(i).gameObject, true);
-                count--;
+                if(transform.GetChild(i).name != "PredefinedPath")
+                {
+                    DestroyImmediate(transform.GetChild(i).gameObject, true);
+                    count--;
+                }
+                else
+                    i++;
             }
 
             grid = null;
@@ -118,6 +126,7 @@ public class TileSetGenerator : MonoBehaviour
     {
         if (gridCleared)
         {
+            terrainGenerated = true;
             gridCleared = false;
             Initialize();
             if (preDefinedPath)

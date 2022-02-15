@@ -5,8 +5,9 @@ using UnityEngine;
 public class ButtonScript : MonoBehaviour
 {
     public Light currentlight;
+    public GameManager GM;
+    
     bool buttonPressed;
-
 
     // Start is called before the first frame update
     void Start()
@@ -23,6 +24,10 @@ public class ButtonScript : MonoBehaviour
         else
         {
             currentlight.enabled = true;
+            if (transform.name == "Generate")
+                GM.GenerateTileSet();
+            else if (transform.name == "Clear")
+                GM.ClearTileSet();
         }
         buttonPressed = !buttonPressed;
     }

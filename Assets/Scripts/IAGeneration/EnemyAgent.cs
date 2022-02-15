@@ -31,9 +31,10 @@ public class EnemyAgent : MonoBehaviour
     public NavMeshAgent agent;
     public Transform shootPos;
     public GameObject arrow;
+    public Transform currentWaypoint;
     public Transform[] waypoints;
     public List<Transform> homePositions;
-    public List<Vector3> strategicalPosition; //TODO: Falta implementar como obtenemos las posiciones del mapa
+    public List<Vector3> strategicalPosition;
 
 
     // Game data container to use the BehviourBlocks
@@ -51,7 +52,6 @@ public class EnemyAgent : MonoBehaviour
     // Enemy Functional variables
     int waypointIndex;
     float waitTimer = 5.0f;
-    Transform currentWaypoint;
     Transform homeWaypoint;
     bool retreating = false;
     bool strategicallyHide = false;
@@ -69,6 +69,7 @@ public class EnemyAgent : MonoBehaviour
 
     // Tiles Grid to search the strategical positions
     Transform tileMap;
+    Transform predefinedPath;
     GameObject[,] gameObjectGrid;
 
     void Start()
@@ -82,8 +83,8 @@ public class EnemyAgent : MonoBehaviour
         player = GameObject.Find("Player");
 
         tileMap = GameObject.Find("TilesGenerator").transform;
+        predefinedPath = tileMap.Find("PredefinedPath");
         gameObjectGrid = new GameObject[tileMap.GetComponent<TileSetGenerator>().numRow, tileMap.GetComponent<TileSetGenerator>().numCol];
-        GetGameObjectGrid();
 
         // Initializing the game data structure
         gameData = new Dictionary<string, float>();
@@ -101,9 +102,13 @@ public class EnemyAgent : MonoBehaviour
         }
         currentBlock = rootBlock;
 
-        GetStrategicalPositions();
+        if (tileMap.GetComponent<TileSetGenerator>().terrainGenerated)
+        {
+            GetGameObjectGrid();
+            GetStrategicalPositions();
+        }
 
-        //DebugArbol(); // Method that shows the tree blocks
+        DebugArbol(); // Method that shows the tree blocks
     }
 
     private void DebugArbol()
@@ -118,6 +123,7 @@ public class EnemyAgent : MonoBehaviour
 
             for (int i = 0; i < currentBlock.children.Count; i++)
             {
+                Debug.Log("Child " + i + ": " + currentBlock.children[i]);
                 visited.Enqueue(currentBlock.children[i]);
             }
         }
@@ -125,8 +131,29 @@ public class EnemyAgent : MonoBehaviour
         currentBlock = rootBlock;
     }
 
+    /// <summary>
+    /// Method called from Game Manager when player generate the terrain in game
+    /// </summary>
+    public void InGameGameObjectGridGeneration()
+    {
+        if (tileMap.GetComponent<TileSetGenerator>().terrainGenerated)
+        {
+            GetGameObjectGrid();
+            GetStrategicalPositions();
+        }
+    }
+
     private void GetGameObjectGrid()
     {
+        if (predefinedPath.gameObject.activeSelf)
+        {
+            for (int i = 0; i < predefinedPath.childCount; i++)
+            {
+                int[] coor = { Mathf.FloorToInt(predefinedPath.GetChild(i).position.z), Mathf.FloorToInt(predefinedPath.GetChild(i).position.x) };
+                gameObjectGrid[coor[0], coor[1]] = predefinedPath.GetChild(i).gameObject;
+            }
+        }
+
         for (int i = 0; i < tileMap.childCount; i++)
         {
             int[] coor = { Mathf.FloorToInt(tileMap.GetChild(i).position.z), Mathf.FloorToInt(tileMap.GetChild(i).position.x) };
@@ -272,11 +299,24 @@ public class EnemyAgent : MonoBehaviour
                 var furthestPosition = -Mathf.Infinity;
                 for (int i = 0; i < homePositions.Count; i++)
                 {
-                    var distance = Vector3.Distance(homePositions[i].position, player.transform.position);
-                    if (distance > furthestPosition)
+                    var selected = false;
+                    foreach (EnemyAgent ally in allies)
                     {
-                        currentWaypoint = homePositions[i];
-                        furthestPosition = distance;
+                        if (homePositions[i] == ally.currentWaypoint)
+                        {
+                            selected = true;
+                            break;
+                        }
+                    }
+
+                    if (!selected) 
+                    {
+                        var distance = Vector3.Distance(homePositions[i].position, player.transform.position);
+                        if (distance > furthestPosition)
+                        {
+                            currentWaypoint = homePositions[i];
+                            furthestPosition = distance;
+                        }
                     }
                 }
             }
@@ -285,11 +325,24 @@ public class EnemyAgent : MonoBehaviour
                 var closestPosition = Mathf.Infinity;
                 for (int i = 0; i < homePositions.Count; i++)
                 {
-                    var distance = Vector3.Distance(homePositions[i].position, player.transform.position);
-                    if (distance < closestPosition)
+                    var selected = false;
+                    foreach (EnemyAgent ally in allies)
                     {
-                        currentWaypoint = homePositions[i];
-                        closestPosition = distance;
+                        if (homePositions[i] == ally.currentWaypoint)
+                        {
+                            selected = true;
+                            break;
+                        }
+                    }
+
+                    if (!selected)
+                    {
+                        var distance = Vector3.Distance(homePositions[i].position, player.transform.position);
+                        if (distance < closestPosition)
+                        {
+                            currentWaypoint = homePositions[i];
+                            closestPosition = distance;
+                        }
                     }
                 }
             }
@@ -322,11 +375,26 @@ public class EnemyAgent : MonoBehaviour
                 var bestDistance = Mathf.Infinity;
                 for (int i = 0; i < strategicalPosition.Count; i++)
                 {
-                    var distance = Vector3.Distance(strategicalPosition[i], player.transform.position);
-                    if (distance > safeDistance && distance < bestDistance)
+                    var selected = false;
+                    foreach (EnemyAgent ally in allies)
                     {
-                        nextPos = strategicalPosition[i];
-                        bestDistance = distance;
+                        if (strategicalPosition[i] == ally.currentWaypoint.position)
+                        {
+                            selected = true;
+                            break;
+                        }
+                    }
+
+                    if (!selected)
+                    {
+                        Debug.Log("No selected: " + selected);
+                        var distance = Vector3.Distance(strategicalPosition[i], player.transform.position);
+
+                        if (distance > safeDistance && distance < bestDistance)
+                        {
+                            nextPos = strategicalPosition[i];
+                            bestDistance = distance;
+                        }
                     }
                 }
             }
@@ -374,15 +442,15 @@ public class EnemyAgent : MonoBehaviour
     /// </summary>
     internal void GetAwayFromPlayer()
     {
-        Debug.Log("Getting away");
-
         float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
         Vector3 futurePlayerPosition = player.transform.position + player.transform.forward * player.GetComponent<Player>().movementSpeed * time; // Future position of the player in that time
 
         Vector3 direction = (futurePlayerPosition - transform.position).normalized; // Get the opposite direction to the player
         Vector3 targetPos = -direction * ShootDistance; // Calculate an appropriate position to shoot to the player
 
-        Debug.Log("Posicion real: " + targetPos + "; posición original: " + futurePlayerPosition);
+        targetPos.x = Mathf.Clamp(targetPos.x, 0f, gameObjectGrid.GetLength(1));
+        targetPos.z = Mathf.Clamp(targetPos.z, 0f, gameObjectGrid.GetLength(0));
+
         agent.SetDestination(targetPos);
     }
 
