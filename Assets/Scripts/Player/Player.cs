@@ -5,26 +5,35 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [Header("Player Movement")]
     public float movementSpeed;
     public float gravity = -9.81f;
     public float jumpHigh = 3.0f;
     public CharacterController controller;
     
+    [Header("Ground Check")]
     public Transform groundCheck;
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
 
+    [Header("Button Pressing")]
     public float rayDistance;
+
+    [Header("Combat Variables")]
+    public float attackTime;
+    public GameObject sword;
+    public float blockTime;
+    public Animator anim;
 
     Vector3 velocity;
     bool isGrounded;
     bool isInGenerationRoom;
-    Transform camera;
+    Transform playerCamera;
 
     private void Start()
     {
         isInGenerationRoom = true;
-        camera = transform.Find("Main Camera");
+        playerCamera = transform.Find("Main Camera");
     }
 
     // Update is called once per frame
@@ -40,6 +49,14 @@ public class Player : MonoBehaviour
 
         if (GetComponent<CharacterController>().enabled)
         {
+            anim.SetFloat("GoingRight", x);
+            anim.SetFloat("GoingForward", z);
+
+            if (((z > 0 || z < 0) && Mathf.Round(z) == 0) || ((x > 0 || x < 0) && Mathf.Round(x) == 0))
+                anim.SetBool("IsIdle", true);
+            else
+                anim.SetBool("IsIdle", false);
+
             Vector3 move = transform.right * x + transform.forward * z;
             controller.Move(move * movementSpeed * Time.deltaTime);
 
@@ -53,14 +70,44 @@ public class Player : MonoBehaviour
             controller.Move(velocity * Time.deltaTime);
         }
 
-        if(isInGenerationRoom && Input.GetMouseButtonDown(0))
+        if(Input.GetMouseButtonDown(0))
         {
-            RaycastHit hit;
-            if(Physics.Raycast(camera.position, camera.forward, out hit, rayDistance, LayerMask.GetMask("InteractuableObject")))
+            if (isInGenerationRoom)
             {
-                hit.transform.GetComponent<ButtonScript>().ButtonPressed();
+                RaycastHit hit;
+                if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, rayDistance, LayerMask.GetMask("InteractuableObject")))
+                {
+                    hit.transform.GetComponent<ButtonScript>().ButtonPressed();
+                }
+            }
+            else
+            {
+                StartCoroutine("SwordAttack");
             }
         }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            StartCoroutine("SwordBlock");
+        }
+    }
+
+    IEnumerator SwordAttack()
+    {
+        sword.GetComponent<BoxCollider>().enabled = true;
+        anim.SetBool("IsAttacking", true);
+        yield return new WaitForSeconds(attackTime);
+        anim.SetBool("IsAttacking", false);
+        sword.GetComponent<BoxCollider>().enabled = false;
+    }
+
+    IEnumerator SwordBlock()
+    {
+        sword.GetComponent<BoxCollider>().enabled = true;
+        anim.SetBool("IsBlocking", true);
+        yield return new WaitForSeconds(blockTime);
+        anim.SetBool("IsBlocking", false);
+        sword.GetComponent<BoxCollider>().enabled = false;
     }
 
     public void PortalTeleport(Vector3 newPos)

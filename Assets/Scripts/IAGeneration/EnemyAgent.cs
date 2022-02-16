@@ -36,6 +36,9 @@ public class EnemyAgent : MonoBehaviour
     public List<Transform> homePositions;
     public List<Vector3> strategicalPosition;
 
+    [Header("Animation Stuff")]
+    public Animator anim;
+
 
     // Game data container to use the BehviourBlocks
     Dictionary<string, float> gameData; // keys: {playerDetected, health, maxHealth, allyNum, ammo, maxAmmo, distanceToPlayer, 
@@ -243,6 +246,7 @@ public class EnemyAgent : MonoBehaviour
                 currentWaypoint = waypoints[waypointIndex];
             }
 
+            anim.SetBool("IsMoving", true);
             agent.SetDestination(currentWaypoint.position);
 
             // Moving among the patrol waypoints
@@ -257,7 +261,10 @@ public class EnemyAgent : MonoBehaviour
                     currentWaypoint = waypoints[waypointIndex];
                 }
                 else
+                {
                     agent.isStopped = true;
+                    anim.SetBool("IsMoving", false);
+                }
             }
             else if (agent.isStopped)// Waiting time until start patrolling again
             {
@@ -266,11 +273,13 @@ public class EnemyAgent : MonoBehaviour
                     Vector3 pos = transform.position + transform.forward * 20;
                     RotateEnemy(pos);
                 }
+
                 waitTimer -= Time.deltaTime;
                 if (waitTimer <= 0f)
                 {
                     waitTimer = 5.0f;
                     agent.isStopped = false;
+                    anim.SetBool("IsMoving", true);
                 }
             }
         }
@@ -348,12 +357,14 @@ public class EnemyAgent : MonoBehaviour
             }
         }
 
+        anim.SetBool("IsMoving", true);
         agent.SetDestination(currentWaypoint.position);
 
         // Waiting for the player to arrive
         if (currentWaypoint != homeWaypoint && Vector3.Distance(transform.position, currentWaypoint.position) < agent.stoppingDistance)
         {
             agent.isStopped = true;
+            anim.SetBool("IsMoving", false);
             RotateEnemy(player.transform.position);
         }
     }
@@ -387,7 +398,6 @@ public class EnemyAgent : MonoBehaviour
 
                     if (!selected)
                     {
-                        Debug.Log("No selected: " + selected);
                         var distance = Vector3.Distance(strategicalPosition[i], player.transform.position);
 
                         if (distance > safeDistance && distance < bestDistance)
@@ -399,11 +409,13 @@ public class EnemyAgent : MonoBehaviour
                 }
             }
 
+            anim.SetBool("IsMoving", true);
             agent.SetDestination(nextPos);
 
             // Waiting the player to arrive
             if (Vector3.Distance(transform.position, nextPos) < agent.stoppingDistance)
             {
+                anim.SetBool("IsMoving", false);
                 agent.isStopped = true;
                 strategicallyHide = true;
             }
@@ -413,7 +425,6 @@ public class EnemyAgent : MonoBehaviour
             var pos = new Vector3(player.transform.position.x, player.transform.position.y + .5f, player.transform.position.z);
             RotateEnemy(pos);
         }
-
     }
 
     /// <summary>
@@ -427,8 +438,8 @@ public class EnemyAgent : MonoBehaviour
         float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
         Vector3 futurePlayerPosition = player.transform.position + player.transform.forward * player.GetComponent<Player>().movementSpeed * time; // Future position of the player in that time
 
+        anim.SetBool("IsMoving", true);
         agent.SetDestination(futurePlayerPosition);
-
 
         // If the enemy is close enought go for the player
         if (Vector3.Distance(transform.position, futurePlayerPosition) >= gameData["distanceToPlayer"])
@@ -451,6 +462,7 @@ public class EnemyAgent : MonoBehaviour
         targetPos.x = Mathf.Clamp(targetPos.x, 0f, gameObjectGrid.GetLength(1));
         targetPos.z = Mathf.Clamp(targetPos.z, 0f, gameObjectGrid.GetLength(0));
 
+        anim.SetBool("IsMoving", true);
         agent.SetDestination(targetPos);
     }
 
@@ -459,6 +471,7 @@ public class EnemyAgent : MonoBehaviour
         if (gameData["distanceToPlayer"] > hitDistance) // Get to hit distance of the player 
         {
             currentWaypoint = player.transform;
+            anim.SetBool("IsMoving", true);
             agent.SetDestination(currentWaypoint.position);
         }
         else
@@ -466,7 +479,7 @@ public class EnemyAgent : MonoBehaviour
             var randomValue = UnityEngine.Random.value;
             if ( randomValue > 0.2) // Attack the player
             {
-                // Ejecutar animación de ataque
+                StartCoroutine("attackAnimation");
             }
             else if(randomValue < 0.1) // Block the player attack
             {
@@ -483,6 +496,7 @@ public class EnemyAgent : MonoBehaviour
         Debug.Log("Shooting");
 
         // Calculate the rotation to face the player
+        anim.SetBool("IsAiming", true);
         var pos = new Vector3(player.transform.position.x, player.transform.position.y + .5f, player.transform.position.z);
         RotateEnemy(pos);
 
@@ -495,6 +509,7 @@ public class EnemyAgent : MonoBehaviour
         Debug.Log("Va a disparar");
         if (!reloading && ammo > 0 && Physics.Raycast(shootPos.position, playerDirection, out hit, ShootDistance) && hit.transform.tag == "Player")
         {
+            anim.SetBool("IsShooting", true);
             Debug.Log("Flecha creada");
             Rigidbody rgbdArrow = Instantiate(arrow, shootPos.position, shootPos.rotation, shootPos).GetComponent<Rigidbody>();
             rgbdArrow.AddForce(playerDirection * shootForce, ForceMode.Impulse);
@@ -531,12 +546,19 @@ public class EnemyAgent : MonoBehaviour
         }
     }
 
+    IEnumerator attackAnimation()
+    {
+        anim.SetBool("IsAttacking", true);
+        yield return new WaitForSeconds(2.0f);
+        anim.SetBool("IsAttacking", false);
+    }
+
     IEnumerator blockAnimation()
     {
-        // Shoot block animation
+        anim.SetBool("IsBlocking", true);
         yield return new WaitForSeconds(1.0f);
         isBlocking = false;
-        // Stop block animation
+        anim.SetBool("IsBlocking", false);
     }
 
     IEnumerator DeathAnimation()
