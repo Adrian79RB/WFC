@@ -244,9 +244,9 @@ public class EnemyAgent : MonoBehaviour
             {
                 waypointIndex = 0;
                 currentWaypoint = waypoints[waypointIndex];
+                anim.SetBool("IsMoving", true);
             }
 
-            anim.SetBool("IsMoving", true);
             agent.SetDestination(currentWaypoint.position);
 
             // Moving among the patrol waypoints
@@ -259,6 +259,7 @@ public class EnemyAgent : MonoBehaviour
                         waypointIndex = 0;
 
                     currentWaypoint = waypoints[waypointIndex];
+                    anim.SetBool("IsMoving", true);
                 }
                 else
                 {
@@ -355,9 +356,10 @@ public class EnemyAgent : MonoBehaviour
                     }
                 }
             }
+
+            anim.SetBool("IsMoving", true);
         }
 
-        anim.SetBool("IsMoving", true);
         agent.SetDestination(currentWaypoint.position);
 
         // Waiting for the player to arrive
@@ -407,9 +409,10 @@ public class EnemyAgent : MonoBehaviour
                         }
                     }
                 }
+
+                anim.SetBool("IsMoving", true);
             }
 
-            anim.SetBool("IsMoving", true);
             agent.SetDestination(nextPos);
 
             // Waiting the player to arrive
@@ -438,7 +441,9 @@ public class EnemyAgent : MonoBehaviour
         float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
         Vector3 futurePlayerPosition = player.transform.position + player.transform.forward * player.GetComponent<Player>().movementSpeed * time; // Future position of the player in that time
 
-        anim.SetBool("IsMoving", true);
+        if(!anim.GetBool("IsMoving"))
+            anim.SetBool("IsMoving", true);
+
         agent.SetDestination(futurePlayerPosition);
 
         // If the enemy is close enought go for the player
@@ -462,7 +467,8 @@ public class EnemyAgent : MonoBehaviour
         targetPos.x = Mathf.Clamp(targetPos.x, 0f, gameObjectGrid.GetLength(1));
         targetPos.z = Mathf.Clamp(targetPos.z, 0f, gameObjectGrid.GetLength(0));
 
-        anim.SetBool("IsMoving", true);
+        if(!anim.GetBool("IsMoving"))
+            anim.SetBool("IsMoving", true);
         agent.SetDestination(targetPos);
     }
 
