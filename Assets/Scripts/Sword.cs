@@ -1,0 +1,20 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Sword : MonoBehaviour
+{
+    public float damage;
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.GetComponent<Player>())
+        {
+            collision.transform.GetComponent<Player>().ReceiveDamage(damage);
+        }
+        else if (collision.transform.GetComponent<EnemyAgent>())
+        {
+            collision.transform.GetComponent<EnemyAgent>().ReceiveDamage(damage);
+        }
+    }
+}

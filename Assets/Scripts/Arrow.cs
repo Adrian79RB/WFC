@@ -21,9 +21,8 @@ public class Arrow : MonoBehaviour
     {
         if(collision.transform.tag == "Player")
         {
-            // Causar daño;
+            collision.transform.GetComponent<Player>().ReceiveDamage(damage);
         }
-        Debug.Log("Crash with " + collision.transform.name);
         Destroy(gameObject);
     }
 }

@@ -31,6 +31,7 @@ public class EnemyAgent : MonoBehaviour
     public NavMeshAgent agent;
     public Transform shootPos;
     public GameObject arrow;
+    public GameObject sword;
     public Transform currentWaypoint;
     public Transform[] waypoints;
     public List<Transform> homePositions;
@@ -74,6 +75,11 @@ public class EnemyAgent : MonoBehaviour
     Transform tileMap;
     Transform predefinedPath;
     GameObject[,] gameObjectGrid;
+
+    // Damage control variables
+    bool damaged = false;
+    float damagedCoolDown = 2.0f;
+    float damagedTime = 0f;
 
     void Start()
     {
@@ -223,6 +229,16 @@ public class EnemyAgent : MonoBehaviour
             retreating = false;
         else if (currentBlock.ToString() != "StrategicPositioning" && strategicallyHide)
             strategicallyHide = false;
+
+        if (damaged)
+        {
+            damagedTime += Time.deltaTime;
+            if(damagedTime >= damagedCoolDown)
+            {
+                damaged = false;
+                damagedTime = 0f;
+            }
+        }
     }
 
     private void RotateEnemy(Vector3 targetPos)
@@ -458,6 +474,9 @@ public class EnemyAgent : MonoBehaviour
     /// </summary>
     internal void GetAwayFromPlayer()
     {
+        if (anim.GetBool("IsAiming"))
+            anim.SetBool("IsAiming", false);
+
         float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
         Vector3 futurePlayerPosition = player.transform.position + player.transform.forward * player.GetComponent<Player>().movementSpeed * time; // Future position of the player in that time
 
@@ -482,12 +501,13 @@ public class EnemyAgent : MonoBehaviour
         }
         else
         {
+            anim.SetBool("IsMoving", false);
             var randomValue = UnityEngine.Random.value;
             if ( randomValue > 0.2) // Attack the player
             {
                 StartCoroutine("attackAnimation");
             }
-            else if(randomValue < 0.1) // Block the player attack
+            else if(randomValue < 0.1 && !isBlocking) // Block the player attack
             {
                 isBlocking = true;
                 StartCoroutine("blockAnimation");
@@ -500,9 +520,13 @@ public class EnemyAgent : MonoBehaviour
     internal void Shoot()
     {
         Debug.Log("Shooting");
+        if (anim.GetBool("IsMoving"))
+            anim.SetBool("IsMoving", false);
+
+        if (!anim.GetBool("IsAiming"))
+            anim.SetBool("IsAiming", true);
 
         // Calculate the rotation to face the player
-        anim.SetBool("IsAiming", true);
         var pos = new Vector3(player.transform.position.x, player.transform.position.y + .5f, player.transform.position.z);
         RotateEnemy(pos);
 
@@ -515,12 +539,8 @@ public class EnemyAgent : MonoBehaviour
         Debug.Log("Va a disparar");
         if (!reloading && ammo > 0 && Physics.Raycast(shootPos.position, playerDirection, out hit, ShootDistance) && hit.transform.tag == "Player")
         {
-            anim.SetBool("IsShooting", true);
+            StartCoroutine(shootAnimation(playerDirection));
             Debug.Log("Flecha creada");
-            Rigidbody rgbdArrow = Instantiate(arrow, shootPos.position, shootPos.rotation, shootPos).GetComponent<Rigidbody>();
-            rgbdArrow.AddForce(playerDirection * shootForce, ForceMode.Impulse);
-            reloading = true;
-            ammo--;
         }
         else if (reloading)
         {
@@ -535,9 +555,13 @@ public class EnemyAgent : MonoBehaviour
 
     public void ReceiveDamage(float damage)
     {
-        health -= damage;
-        if (health <= 0f)
-            StartCoroutine("DeathAnimation");
+        if (!isBlocking && !damaged)
+        {
+            damaged = true;
+            health -= damage;
+            if (health <= 0f)
+                StartCoroutine("DeathAnimation");
+        }
     }
 
     internal void PlayerDetected()
@@ -554,9 +578,11 @@ public class EnemyAgent : MonoBehaviour
 
     IEnumerator attackAnimation()
     {
+        sword.GetComponent<BoxCollider>().enabled = true;
         anim.SetBool("IsAttacking", true);
         yield return new WaitForSeconds(2.0f);
         anim.SetBool("IsAttacking", false);
+        sword.GetComponent<BoxCollider>().enabled = false;
     }
 
     IEnumerator blockAnimation()
@@ -567,11 +593,33 @@ public class EnemyAgent : MonoBehaviour
         anim.SetBool("IsBlocking", false);
     }
 
+    IEnumerator shootAnimation(Vector3 playerDirection)
+    {
+        anim.SetBool("IsShooting", true);
+        Rigidbody rgbdArrow = Instantiate(arrow, shootPos.position, shootPos.rotation, shootPos).GetComponent<Rigidbody>();
+        rgbdArrow.AddForce(playerDirection * shootForce, ForceMode.Impulse);
+        reloading = true;
+        ammo--;
+        yield return new WaitForSeconds(.5f);
+        anim.SetBool("IsShooting", false);
+    }
+
     IEnumerator DeathAnimation()
     {
-        // Shoot death animation
+        agent.isStopped = true;
+        anim.SetBool("IsMoving", false);
+        if (type == EnemyType.Archer)
+        {
+            anim.SetBool("IsShooting", false);
+            anim.SetBool("IsAiming", false);
+        }
+        else
+        {
+            anim.SetBool("IsBlocking", false);
+            anim.SetBool("IsAttacking", false);
+        }
+        anim.SetBool("IsDead", true);
         yield return new WaitForSeconds(2.0f);
-        // Stop animation
         gameObject.SetActive(false);
     }
 

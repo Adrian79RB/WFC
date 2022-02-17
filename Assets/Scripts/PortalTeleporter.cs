@@ -16,6 +16,7 @@ public class PortalTeleporter : MonoBehaviour
         {
             Vector3 portalToPlayer = player.position - transform.position;
             float dotProduct = Vector3.Dot(transform.up, portalToPlayer);
+            Debug.Log("Player pos: " + player.position + "; portal pos: " + transform.position + "; dot product: " + dotProduct);
             if(dotProduct < 0f)
             {
                 float rotDifference = -Quaternion.Angle(transform.rotation, receiver.rotation);
@@ -33,6 +34,7 @@ public class PortalTeleporter : MonoBehaviour
     {
         if(other.tag == "Player")
         {
+            Debug.Log("Player Colliding");
             playerIsOverlapping = true;
         }
     }

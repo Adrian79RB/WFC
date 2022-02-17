@@ -143,9 +143,9 @@ MonoBehaviour:
     weight: 2
   - type: 1
     weight: 2
-  - type: 3
+  - type: 2
     weight: 3
-  - type: 5
+  - type: 4
     weight: 3
   isBlocking: 0
   shootForce: 20
@@ -164,7 +164,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   strategicalPosition: []
-  anim: {fileID: 0}
+  anim: {fileID: 6058026701295198053}
   playerDetected: 0
 --- !u!1 &7061655504256747364
 GameObject:
@@ -245,7 +245,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4376739370792916, guid: e15d7e93bc4c903478c76f584dd305aa, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -1.02
       objectReference: {fileID: 0}
     - target: {fileID: 4376739370792916, guid: e15d7e93bc4c903478c76f584dd305aa, type: 3}
       propertyPath: m_LocalPosition.z
@@ -279,10 +279,19 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 95833414833791992, guid: e15d7e93bc4c903478c76f584dd305aa, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 590d13db3ac12414b9fed0b2d594b7a6, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e15d7e93bc4c903478c76f584dd305aa, type: 3}
 --- !u!4 &6145606257189817161 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4376739370792916, guid: e15d7e93bc4c903478c76f584dd305aa, type: 3}
+  m_PrefabInstance: {fileID: 6144626004071546013}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &6058026701295198053 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 95833414833791992, guid: e15d7e93bc4c903478c76f584dd305aa, type: 3}
   m_PrefabInstance: {fileID: 6144626004071546013}
   m_PrefabAsset: {fileID: 0}

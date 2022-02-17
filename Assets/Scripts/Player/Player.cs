@@ -2,10 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
-    [Header("Player Movement")]
+    [Header("Player Stats")]
+    public float health;
     public float movementSpeed;
     public float gravity = -9.81f;
     public float jumpHigh = 3.0f;
@@ -25,10 +27,17 @@ public class Player : MonoBehaviour
     public float blockTime;
     public Animator anim;
 
-    Vector3 velocity;
+    // Movement variables
     bool isGrounded;
     bool isInGenerationRoom;
+    Vector3 velocity;
     Transform playerCamera;
+
+    // Combat variables
+    bool isBlocking;
+    float damageCoolDown = 2.0f;
+    float damageTime = 0;
+    bool damaged = false;
 
     private void Start()
     {
@@ -51,11 +60,6 @@ public class Player : MonoBehaviour
         {
             anim.SetFloat("GoingRight", x);
             anim.SetFloat("GoingForward", z);
-
-            if (((z > 0 || z < 0) && Mathf.Round(z) == 0) || ((x > 0 || x < 0) && Mathf.Round(x) == 0))
-                anim.SetBool("IsIdle", true);
-            else
-                anim.SetBool("IsIdle", false);
 
             Vector3 move = transform.right * x + transform.forward * z;
             controller.Move(move * movementSpeed * Time.deltaTime);
@@ -88,7 +92,18 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonDown(1))
         {
+            isBlocking = true;
             StartCoroutine("SwordBlock");
+        }
+
+        if (damaged)
+        {
+            damageTime += Time.deltaTime;
+            if(damageTime >= damageCoolDown)
+            {
+                damageTime = 0;
+                damaged = false;
+            }
         }
     }
 
@@ -103,11 +118,10 @@ public class Player : MonoBehaviour
 
     IEnumerator SwordBlock()
     {
-        sword.GetComponent<BoxCollider>().enabled = true;
         anim.SetBool("IsBlocking", true);
         yield return new WaitForSeconds(blockTime);
         anim.SetBool("IsBlocking", false);
-        sword.GetComponent<BoxCollider>().enabled = false;
+        isBlocking = false;
     }
 
     public void PortalTeleport(Vector3 newPos)
@@ -122,5 +136,31 @@ public class Player : MonoBehaviour
         isInGenerationRoom = false;
         yield return new WaitForSeconds(1.0f);
         GetComponent<CharacterController>().enabled = true;
+    }
+
+    public void ReceiveDamage(float damage)
+    {
+        if (!isBlocking && !damaged)
+        {
+            damaged = true;
+            health -= damage;
+            if (health <= 0f)
+            {
+                health = 0;
+                StartCoroutine("DeadAnimation");
+            }
+        }
+    }
+
+    IEnumerator DeadAnimation()
+    {
+        anim.SetBool("IsIdle", true);
+        anim.SetBool("IsAttacking", false);
+        anim.SetBool("IsBlocking", false);
+        anim.SetBool("IsDead", true);
+
+        yield return new WaitForSeconds(2.0f);
+
+        SceneManager.LoadScene("Scene1");
     }
 }
