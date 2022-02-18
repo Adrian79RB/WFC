@@ -26,7 +26,6 @@ public class EnemyAgent : MonoBehaviour
 
     // Enemy Functional stuff
     [Header("Enemy Functionality stuff")]
-    public bool isBlocking;
     public float shootForce;
     public NavMeshAgent agent;
     public Transform shootPos;
@@ -52,6 +51,8 @@ public class EnemyAgent : MonoBehaviour
     EnemyAgent[] allies;
     int allyNum;
     GameObject player;
+    bool isBlocking;
+    bool isAttacking;
 
     // Enemy Functional variables
     int waypointIndex;
@@ -499,17 +500,16 @@ public class EnemyAgent : MonoBehaviour
             anim.SetBool("IsMoving", true);
             agent.SetDestination(currentWaypoint.position);
         }
-        else
+        else if(!isAttacking && !isBlocking)
         {
             anim.SetBool("IsMoving", false);
             var randomValue = UnityEngine.Random.value;
-            if ( randomValue > 0.2) // Attack the player
+            if ( randomValue > 0.6) // Attack the player
             {
                 StartCoroutine("attackAnimation");
             }
-            else if(randomValue < 0.1 && !isBlocking) // Block the player attack
+            else if(randomValue < 0.3 && !isBlocking) // Block the player attack
             {
-                isBlocking = true;
                 StartCoroutine("blockAnimation");
             }
             var pos = new Vector3(player.transform.position.x, player.transform.position.y + .5f, player.transform.position.z);
@@ -578,17 +578,20 @@ public class EnemyAgent : MonoBehaviour
 
     IEnumerator attackAnimation()
     {
+        isAttacking = true;
         sword.GetComponent<BoxCollider>().enabled = true;
         anim.SetBool("IsAttacking", true);
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(1.5f);
         anim.SetBool("IsAttacking", false);
         sword.GetComponent<BoxCollider>().enabled = false;
+        isAttacking = false;
     }
 
     IEnumerator blockAnimation()
     {
+        isBlocking = true;
         anim.SetBool("IsBlocking", true);
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(1.5f);
         isBlocking = false;
         anim.SetBool("IsBlocking", false);
     }
