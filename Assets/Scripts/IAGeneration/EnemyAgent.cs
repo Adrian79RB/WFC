@@ -395,6 +395,8 @@ public class EnemyAgent : MonoBehaviour
     {
         if (!strategicallyHide)
         {
+            Debug.Log("Executing Strategic Pos");
+
             if (agent.isStopped)
                 agent.isStopped = false;
 
@@ -402,12 +404,14 @@ public class EnemyAgent : MonoBehaviour
             // Searching a strategical position in the arena
             if (!strategicalPosition.Contains(agent.destination))
             {
+                Debug.Log("Analising Strategical Pos");
                 var bestDistance = Mathf.Infinity;
                 for (int i = 0; i < strategicalPosition.Count; i++)
                 {
                     var selected = false;
                     foreach (EnemyAgent ally in allies)
                     {
+                        Debug.Log("Searching among allies");
                         if (strategicalPosition[i] == ally.currentWaypoint.position)
                         {
                             selected = true;
@@ -418,7 +422,7 @@ public class EnemyAgent : MonoBehaviour
                     if (!selected)
                     {
                         var distance = Vector3.Distance(strategicalPosition[i], player.transform.position);
-
+                        Debug.Log("Calculating Distance: " + distance + "; best distance: " + bestDistance + "; safe distance: " + safeDistance);
                         if (distance > safeDistance && distance < bestDistance)
                         {
                             nextPos = strategicalPosition[i];
@@ -433,8 +437,9 @@ public class EnemyAgent : MonoBehaviour
             agent.SetDestination(nextPos);
 
             // Waiting the player to arrive
-            if (Vector3.Distance(transform.position, nextPos) < agent.stoppingDistance)
+            if (Vector3.Distance(transform.position, nextPos) < 1f)
             {
+                Debug.Log("Stopping");
                 anim.SetBool("IsMoving", false);
                 agent.isStopped = true;
                 strategicallyHide = true;
@@ -496,12 +501,18 @@ public class EnemyAgent : MonoBehaviour
     {
         if (gameData["distanceToPlayer"] > hitDistance) // Get to hit distance of the player 
         {
+            if (agent.isStopped)
+                agent.isStopped = false;
+
             currentWaypoint = player.transform;
             anim.SetBool("IsMoving", true);
             agent.SetDestination(currentWaypoint.position);
         }
         else if(!isAttacking && !isBlocking)
         {
+            if (!agent.isStopped)
+                agent.isStopped = true;
+
             anim.SetBool("IsMoving", false);
             var randomValue = UnityEngine.Random.value;
             if ( randomValue > 0.6) // Attack the player

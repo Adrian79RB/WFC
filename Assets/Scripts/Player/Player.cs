@@ -92,7 +92,6 @@ public class Player : MonoBehaviour
 
         if (Input.GetMouseButtonDown(1))
         {
-            isBlocking = true;
             StartCoroutine("SwordBlock");
         }
 
@@ -118,6 +117,7 @@ public class Player : MonoBehaviour
 
     IEnumerator SwordBlock()
     {
+        isBlocking = true;
         anim.SetBool("IsBlocking", true);
         yield return new WaitForSeconds(blockTime);
         anim.SetBool("IsBlocking", false);
@@ -140,6 +140,7 @@ public class Player : MonoBehaviour
 
     public void ReceiveDamage(float damage)
     {
+        Debug.Log("Recibe daño. Protegiendo: " + isBlocking);
         if (!isBlocking && !damaged)
         {
             damaged = true;
@@ -154,7 +155,6 @@ public class Player : MonoBehaviour
 
     IEnumerator DeadAnimation()
     {
-        anim.SetBool("IsIdle", true);
         anim.SetBool("IsAttacking", false);
         anim.SetBool("IsBlocking", false);
         anim.SetBool("IsDead", true);

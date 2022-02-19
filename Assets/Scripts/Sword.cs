@@ -9,13 +9,18 @@ public class Sword : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         Debug.Log("This sword: " + transform.name + "; object hit: "+ collision.transform.name);
-        if (collision.transform.GetComponent<Player>())
-        {
-            collision.transform.GetComponent<Player>().ReceiveDamage(damage);
-        }
-        else if (collision.transform.GetComponent<EnemyAgent>())
+        if (collision.transform.GetComponent<EnemyAgent>())
         {
             collision.transform.GetComponent<EnemyAgent>().ReceiveDamage(damage);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("This sword: " + transform.name + "; object hit: " + other.transform.name);
+        if (other.transform.GetComponent<Player>())
+        {
+            other.transform.GetComponent<Player>().ReceiveDamage(damage);
         }
     }
 }

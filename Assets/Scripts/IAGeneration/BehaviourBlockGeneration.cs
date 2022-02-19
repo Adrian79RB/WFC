@@ -217,14 +217,14 @@ public class BehaviourBlockGeneration
         {
             ConstraintPropagation(rowIndex, colIndex + 1, 1, grid[rowIndex, colIndex], 0);
 
-            if (!grid[rowIndex, colIndex].children.Contains( grid[rowIndex, (colIndex + 1)] ))
+            if (grid[rowIndex, colIndex + 1].domainCount > 0 && !grid[rowIndex, colIndex].children.Contains( grid[rowIndex, (colIndex + 1)] ))
                 grid[rowIndex, colIndex].children.Add(grid[rowIndex, (colIndex + 1)]);
         }
         if (rowIndex < (numRow - 1))
         {
             ConstraintPropagation(rowIndex + 1, colIndex, 2, grid[rowIndex, colIndex], 0);
 
-            if (!grid[rowIndex, colIndex].children.Contains( grid[(rowIndex + 1), colIndex] ))
+            if (grid[rowIndex + 1, colIndex].domainCount > 0 && !grid[rowIndex, colIndex].children.Contains( grid[(rowIndex + 1), colIndex] ))
                 grid[rowIndex, colIndex].children.Add(grid[(rowIndex + 1), colIndex]);
         }
 
@@ -235,7 +235,7 @@ public class BehaviourBlockGeneration
 
     private void ConstraintPropagation(int rowIndex, int colIndex, int direction, IAVariable lastCell, int step)
     {
-        if (grid[rowIndex, colIndex].domainCount == 1 || step >= maxSteps)
+        if (grid[rowIndex, colIndex].domainCount < 1 || step >= maxSteps)
             return;
 
         step++;
@@ -276,7 +276,7 @@ public class BehaviourBlockGeneration
 
             for (int i = 0; i < grid[rowIndex, colIndex].visited.Length; i++)
             {
-                if(grid[rowIndex, colIndex].visited[i] < 1)
+                if(grid[rowIndex, colIndex].domain[i] && grid[rowIndex, colIndex].visited[i] < 1)
                 {
                     grid[rowIndex, colIndex].domain[i] = false;
                     grid[rowIndex, colIndex].domainCount--;
@@ -311,7 +311,7 @@ public class BehaviourBlockGeneration
         {
             ConstraintPropagation(rowIndex, colIndex + 1, 1, grid[rowIndex, colIndex], step);
 
-            if (grid[rowIndex, colIndex].domainCount == 1 && !grid[rowIndex, colIndex].children.Contains(grid[rowIndex, (colIndex + 1)]))
+            if (grid[rowIndex, colIndex].domainCount == 1 && grid[rowIndex, colIndex + 1].domainCount > 0 && !grid[rowIndex, colIndex].children.Contains(grid[rowIndex, (colIndex + 1)]))
                 grid[rowIndex, colIndex].children.Add(grid[rowIndex, colIndex + 1]);
         }
 
@@ -319,7 +319,7 @@ public class BehaviourBlockGeneration
         {
             ConstraintPropagation(rowIndex + 1, colIndex, 2, grid[rowIndex, colIndex], step);
 
-            if (grid[rowIndex, colIndex].domainCount == 1 && !grid[rowIndex, colIndex].children.Contains(grid[(rowIndex + 1), colIndex]))
+            if (grid[rowIndex, colIndex].domainCount == 1 && grid[rowIndex + 1, colIndex].domainCount > 0 && !grid[rowIndex, colIndex].children.Contains(grid[(rowIndex + 1), colIndex]))
                 grid[rowIndex, colIndex].children.Add(grid[rowIndex + 1, colIndex]);
         }
     }
