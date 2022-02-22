@@ -58,6 +58,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7332d7d093cc8743bc4234da5d0ab44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shotPos: {fileID: 0}
 --- !u!1 &4786582424736393133
 GameObject:
   m_ObjectHideFlags: 0
@@ -192,24 +193,25 @@ MonoBehaviour:
   type: 0
   maxHealth: 10
   maxAmmo: 5
-  safeDistance: 7
+  safeDistance: 6
   AttackDistance: 5
-  ShootDistance: 6
+  ShootDistance: 5
   hitDistance: 1
   enemyBlockSet:
   - type: 0
-    weight: 2
+    weight: 1
   - type: 1
     weight: 2
   - type: 3
-    weight: 3
+    weight: 4
   - type: 5
-    weight: 3
-  isBlocking: 0
-  shootForce: 40
+    weight: 2
+  shootForce: 20
+  tileMap: {fileID: 0}
   agent: {fileID: 4786582425097354830}
   shootPos: {fileID: 4786582424736393132}
   arrow: {fileID: 1250234551581017040, guid: 796fd5d999272064d8a3259b43f9bc2a, type: 3}
+  sword: {fileID: 0}
   currentWaypoint: {fileID: 0}
   waypoints:
   - {fileID: 0}
@@ -221,7 +223,10 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   strategicalPosition: []
+  anim: {fileID: 1339412036151286712}
   playerDetected: 0
 --- !u!1001 &1423795294332452684
 PrefabInstance:
@@ -283,6 +288,11 @@ PrefabInstance:
 --- !u!4 &1426724603875059376 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4195947257436668, guid: 76b6595faecb2ed49ae5b4dd4fe1a5af, type: 3}
+  m_PrefabInstance: {fileID: 1423795294332452684}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1339412036151286712 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 95941600905061620, guid: 76b6595faecb2ed49ae5b4dd4fe1a5af, type: 3}
   m_PrefabInstance: {fileID: 1423795294332452684}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1426762648791529480 stripped

@@ -23,7 +23,7 @@ public class TileSetGenerator : MonoBehaviour
     public int maxSteps;
     public bool terrainGenerated = false;
     public Vector3 tileSize;
-    public Tile[] tileSet;
+    public List<Tile> tileSet;
     public NavMeshSurface surface;
     public Transform predefinedPath;
     [HideInInspector] public Variable[,] grid;
@@ -49,7 +49,7 @@ public class TileSetGenerator : MonoBehaviour
             for (int j = 0; j < grid.GetLength(1); j++)
             {
                 grid[i, j] = ScriptableObject.CreateInstance<Variable>();
-                grid[i, j].SetVariable(tileSet.Length);
+                grid[i, j].SetVariable(tileSet.Count);
             }
         }
 
@@ -65,7 +65,7 @@ public class TileSetGenerator : MonoBehaviour
                 predefinedPathCoor[i, 1] = coor[1];
                 int choosenTile = -1;
 
-                for (int k = 0; k < tileSet.Length; k++)
+                for (int k = 0; k < tileSet.Count; k++)
                 {
                     if (predefinedPath.GetChild(i).name.StartsWith(tileSet[k].tile.transform.name))
                         choosenTile = k;
@@ -383,7 +383,7 @@ public class TileSetGenerator : MonoBehaviour
             choosenNumber++;
         }
 
-        for( int k = 0; k < tileSet.Length; k++)
+        for( int k = 0; k < tileSet.Count; k++)
         {
             if (availableTiles[choosenNumber].tile.name == tileSet[k].tile.name)
             {

@@ -52,12 +52,12 @@ public class Variable : ScriptableObject
         tileReference = Instantiate(tile.gameObject, position, tileChosen.transform.rotation, parent);
     }
 
-    public void CalculateEntropy(Tile[] tileSet)
+    public void CalculateEntropy(List<Tile> tileSet)
     {
         float auxiliar = 0f;
         float maxWeight = 0f;
 
-        for (int i = 0; i < tileSet.Length; i++)
+        for (int i = 0; i < tileSet.Count; i++)
         {
             if (domain[i])
                 maxWeight += tileSet[i].weight;

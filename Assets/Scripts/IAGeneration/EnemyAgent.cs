@@ -27,6 +27,7 @@ public class EnemyAgent : MonoBehaviour
     // Enemy Functional stuff
     [Header("Enemy Functionality stuff")]
     public float shootForce;
+    public Transform tileMap;
     public NavMeshAgent agent;
     public Transform shootPos;
     public GameObject arrow;
@@ -73,7 +74,6 @@ public class EnemyAgent : MonoBehaviour
     BehaviourBlock currentBlock;
 
     // Tiles Grid to search the strategical positions
-    Transform tileMap;
     Transform predefinedPath;
     GameObject[,] gameObjectGrid;
 
@@ -84,22 +84,6 @@ public class EnemyAgent : MonoBehaviour
 
     void Start()
     {
-        // Initializing the Game Variables
-        playerDetected = false;
-        ammo = maxAmmo;
-        health = maxHealth;
-        allies = FindObjectsOfType<EnemyAgent>();
-        homeWaypoint = GameObject.Find("homeWaypoint").transform;
-        player = GameObject.Find("Player");
-
-        tileMap = GameObject.Find("TilesGenerator").transform;
-        predefinedPath = tileMap.Find("PredefinedPath");
-        gameObjectGrid = new GameObject[tileMap.GetComponent<TileSetGenerator>().numRow, tileMap.GetComponent<TileSetGenerator>().numCol];
-
-        // Initializing the game data structure
-        gameData = new Dictionary<string, float>();
-        gameDataUpdateTime = gameDataUpdateTimer;
-
         // Creating the Decision Tree
         treeGenerator = new BehaviourBlockGeneration();
         treeGenerator.blockSet = enemyBlockSet;
@@ -112,13 +96,28 @@ public class EnemyAgent : MonoBehaviour
         }
         currentBlock = rootBlock;
 
-        if (tileMap.GetComponent<TileSetGenerator>().terrainGenerated)
-        {
-            GetGameObjectGrid();
-            GetStrategicalPositions();
-        }
-
         DebugArbol(); // Method that shows the tree blocks
+    }
+
+    private void OnEnable()
+    {
+        // Initializing the Game Variables
+        playerDetected = false;
+        ammo = maxAmmo;
+        health = maxHealth;
+        allies = FindObjectsOfType<EnemyAgent>();
+        homeWaypoint = GameObject.Find("homeWaypoint").transform;
+        player = GameObject.Find("Player");
+
+        predefinedPath = tileMap.Find("PredefinedPath");
+        gameObjectGrid = new GameObject[tileMap.GetComponent<TileSetGenerator>().numRow, tileMap.GetComponent<TileSetGenerator>().numCol];
+
+        // Initializing the game data structure
+        gameData = new Dictionary<string, float>();
+        gameDataUpdateTime = gameDataUpdateTimer;
+
+        GetGameObjectGrid();
+        GetStrategicalPositions();
     }
 
     private void DebugArbol()
@@ -139,18 +138,6 @@ public class EnemyAgent : MonoBehaviour
         }
 
         currentBlock = rootBlock;
-    }
-
-    /// <summary>
-    /// Method called from Game Manager when player generate the terrain in game
-    /// </summary>
-    public void InGameGameObjectGridGeneration()
-    {
-        if (tileMap.GetComponent<TileSetGenerator>().terrainGenerated)
-        {
-            GetGameObjectGrid();
-            GetStrategicalPositions();
-        }
     }
 
     private void GetGameObjectGrid()
