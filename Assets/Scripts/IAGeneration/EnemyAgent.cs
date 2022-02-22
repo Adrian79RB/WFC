@@ -566,11 +566,13 @@ public class EnemyAgent : MonoBehaviour
     {
         playerDetected = true;
 
-        // Warn the other allies of the player position
-        for (int i = 0; i < allies.Length; i++)
+        Collider[] allies = Physics.OverlapSphere(transform.position, 20f, LayerMask.GetMask("Enemy"));
+        foreach (Collider ally in allies)
         {
-            if (allies[i].gameObject.activeSelf && !allies[i].playerDetected) // Creo que no se hace bucle infinito por que el primero que pille al jugador activa todos los demas
-                allies[i].PlayerDetected();
+            if (!ally.GetComponent<EnemyAgent>().playerDetected)
+            {
+                ally.GetComponent<EnemyAgent>().PlayerDetected();
+            }
         }
     }
 

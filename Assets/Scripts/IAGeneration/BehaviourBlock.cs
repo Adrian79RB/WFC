@@ -67,8 +67,7 @@ public class Retreat : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        //Debug.Log("I am " + this.ToString() + "; player detected: " + gameData["playerDetected"] + "; health: " + gameData["health"] + "; ally number: " + gameData["allyNum"] + "; ammo: " + gameData["ammo"]);
-        return gameData["playerDetected"] == 1f && (gameData["health"] < gameData["maxHealth"] / 3 || gameData["allyNum"] < 5f || gameData["ammo"] < gameData["maxAmmo"] / 3);
+        return gameData["playerDetected"] == 1f && (gameData["health"] < gameData["maxHealth"] / 3 || gameData["allyNum"] < 4f || gameData["ammo"] < gameData["maxAmmo"] / 2);
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)

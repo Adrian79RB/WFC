@@ -43,13 +43,13 @@ GameObject:
   - component: {fileID: 3802713115822043918}
   - component: {fileID: 3802713115822043905}
   - component: {fileID: 3802713115822043904}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Enemy_Swordman
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3802713115822043917
 Transform:
   m_ObjectHideFlags: 0

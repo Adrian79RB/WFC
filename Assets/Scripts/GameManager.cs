@@ -54,9 +54,20 @@ public class GameManager : MonoBehaviour
 
         tileSetGenerator.Generate();
 
-        for (int k = 0; k < enemies.Length; k++)
+        var enemyCount = 0;
+        int k = 0;
+
+        while(enemyCount < 4 && k < enemies.Length)
         {
-            enemies[k].gameObject.SetActive(true);
+            if (!enemies[k].gameObject.activeSelf && Random.value > 0.3)
+            {
+                enemyCount++;
+                enemies[k].gameObject.SetActive(true);
+            }
+
+            k++;
+            if (k >= enemies.Length && enemyCount < 4)
+                k = 0;
         }
     }
 

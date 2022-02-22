@@ -102,13 +102,13 @@ GameObject:
   - component: {fileID: 4786582425097354817}
   - component: {fileID: 4786582425097354830}
   - component: {fileID: 4786582425097354831}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Enemy_Archer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4786582425097354818
 Transform:
   m_ObjectHideFlags: 0
