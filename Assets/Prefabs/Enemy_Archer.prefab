@@ -136,7 +136,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
+  m_Radius: 0.7
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -194,8 +194,8 @@ MonoBehaviour:
   maxHealth: 10
   maxAmmo: 5
   safeDistance: 6
-  AttackDistance: 5
-  ShootDistance: 5
+  AttackDistance: 4
+  ShootDistance: 8
   hitDistance: 1
   enemyBlockSet:
   - type: 0
@@ -206,7 +206,7 @@ MonoBehaviour:
     weight: 4
   - type: 5
     weight: 2
-  shootForce: 20
+  shootForce: 15
   tileMap: {fileID: 0}
   agent: {fileID: 4786582425097354830}
   shootPos: {fileID: 4786582424736393132}

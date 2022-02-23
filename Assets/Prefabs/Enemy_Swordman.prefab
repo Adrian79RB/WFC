@@ -134,10 +134,10 @@ MonoBehaviour:
   type: 1
   maxHealth: 10
   maxAmmo: 5
-  safeDistance: 5
-  AttackDistance: 5
-  ShootDistance: 6
-  hitDistance: 1.5
+  safeDistance: 6
+  AttackDistance: 4
+  ShootDistance: 8
+  hitDistance: 2
   enemyBlockSet:
   - type: 0
     weight: 2

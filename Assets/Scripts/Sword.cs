@@ -14,13 +14,4 @@ public class Sword : MonoBehaviour
             collision.transform.GetComponent<EnemyAgent>().ReceiveDamage(damage);
         }
     }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("This sword: " + transform.name + "; object hit: " + other.transform.name);
-        if (other.transform.GetComponent<Player>())
-        {
-            other.transform.GetComponent<Player>().ReceiveDamage(damage);
-        }
-    }
 }

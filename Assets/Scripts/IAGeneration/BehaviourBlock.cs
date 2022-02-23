@@ -91,8 +91,7 @@ public class StrategicPositioning : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        //Debug.Log("I am " + this.ToString() + "; player detected: " + gameData["playerDetected"] + "; distance to player: " + gameData["distanceToPlayer"] + "; safe distance: " + gameData["safeDistance"]);
-        return gameData["playerDetected"] == 1f && gameData["distanceToPlayer"] > gameData["safeDistance"];
+        return gameData["playerDetected"] == 1f && (gameData["distanceToPlayer"] > gameData["safeDistance"] || gameData["playerVisible"] == 1.0f);
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
@@ -185,7 +184,7 @@ public class Shoot : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["playerDetected"] == 1f && gameData["distanceToPlayer"] > gameData["ShootDistance"];
+        return gameData["playerDetected"] == 1f && (gameData["distanceToPlayer"] > gameData["ShootDistance"] || gameData["playerVisible"] == 1.0f);
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)

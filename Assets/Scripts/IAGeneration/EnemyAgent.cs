@@ -61,11 +61,12 @@ public class EnemyAgent : MonoBehaviour
     Transform homeWaypoint;
     bool retreating = false;
     bool strategicallyHide = false;
-    float shootCoolDown = 3.0f;
+    float shootCoolDown = 8.0f;
     bool reloading = false;
+    bool gettingAway = true;
 
     // Variables that check the gameData Update
-    float gameDataUpdateTimer = 5.0f;
+    float gameDataUpdateTimer = 2.5f;
     float gameDataUpdateTime = 0.0f;
 
     // BehaviourGenerator and BehaviourTree
@@ -382,8 +383,6 @@ public class EnemyAgent : MonoBehaviour
     {
         if (!strategicallyHide)
         {
-            Debug.Log("Executing Strategic Pos");
-
             if (agent.isStopped)
                 agent.isStopped = false;
 
@@ -391,14 +390,12 @@ public class EnemyAgent : MonoBehaviour
             // Searching a strategical position in the arena
             if (!strategicalPosition.Contains(agent.destination))
             {
-                Debug.Log("Analising Strategical Pos");
                 var bestDistance = Mathf.Infinity;
                 for (int i = 0; i < strategicalPosition.Count; i++)
                 {
                     var selected = false;
                     foreach (EnemyAgent ally in allies)
                     {
-                        Debug.Log("Searching among allies");
                         if (strategicalPosition[i] == ally.currentWaypoint.position)
                         {
                             selected = true;
@@ -409,7 +406,6 @@ public class EnemyAgent : MonoBehaviour
                     if (!selected)
                     {
                         var distance = Vector3.Distance(strategicalPosition[i], player.transform.position);
-                        Debug.Log("Calculating Distance: " + distance + "; best distance: " + bestDistance + "; safe distance: " + safeDistance);
                         if (distance > safeDistance && distance < bestDistance)
                         {
                             nextPos = strategicalPosition[i];
@@ -426,7 +422,6 @@ public class EnemyAgent : MonoBehaviour
             // Waiting the player to arrive
             if (Vector3.Distance(transform.position, nextPos) < 1f)
             {
-                Debug.Log("Stopping");
                 anim.SetBool("IsMoving", false);
                 agent.isStopped = true;
                 strategicallyHide = true;
@@ -467,26 +462,33 @@ public class EnemyAgent : MonoBehaviour
     /// </summary>
     internal void GetAwayFromPlayer()
     {
-        if (anim.GetBool("IsAiming"))
-            anim.SetBool("IsAiming", false);
+        if (gettingAway)
+        {
+            if (anim.GetBool("IsAiming"))
+                anim.SetBool("IsAiming", false);
 
-        float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
-        Vector3 futurePlayerPosition = player.transform.position + player.transform.forward * player.GetComponent<Player>().movementSpeed * time; // Future position of the player in that time
+            Vector3 direction = (player.transform.position - transform.position).normalized; // Get the opposite direction to the player
+            Vector3 targetPos = -direction * ShootDistance; // Calculate an appropriate position to shoot to the player
 
-        Vector3 direction = (futurePlayerPosition - transform.position).normalized; // Get the opposite direction to the player
-        Vector3 targetPos = -direction * ShootDistance; // Calculate an appropriate position to shoot to the player
+            targetPos.x = Mathf.Clamp(targetPos.x, 1f, gameObjectGrid.GetLength(1) - 2);
+            targetPos.z = Mathf.Clamp(targetPos.z, 1f, gameObjectGrid.GetLength(0) - 2);
+            Debug.Log("Posicion de huida: " + targetPos);
 
-        targetPos.x = Mathf.Clamp(targetPos.x, 0f, gameObjectGrid.GetLength(1));
-        targetPos.z = Mathf.Clamp(targetPos.z, 0f, gameObjectGrid.GetLength(0));
+            if (!anim.GetBool("IsMoving"))
+                anim.SetBool("IsMoving", true);
+            agent.SetDestination(targetPos);
 
-        if(!anim.GetBool("IsMoving"))
-            anim.SetBool("IsMoving", true);
-        agent.SetDestination(targetPos);
+            if (Vector3.Distance(transform.position, targetPos) < agent.stoppingDistance)
+            {
+                gettingAway = false;
+                agent.isStopped = true;
+            }
+        }
     }
 
     internal void Attack()
     {
-        if (gameData["distanceToPlayer"] > hitDistance) // Get to hit distance of the player 
+        if (gameData["distanceToPlayer"] > 1.7f) // Get to hit distance of the player 
         {
             if (agent.isStopped)
                 agent.isStopped = false;
@@ -517,7 +519,6 @@ public class EnemyAgent : MonoBehaviour
 
     internal void Shoot()
     {
-        Debug.Log("Shooting");
         if (anim.GetBool("IsMoving"))
             anim.SetBool("IsMoving", false);
 
@@ -534,11 +535,9 @@ public class EnemyAgent : MonoBehaviour
 
         // Check if there is enought ammo to shoot and the player is visible to shoot them
         RaycastHit hit;
-        Debug.Log("Va a disparar");
         if (!reloading && ammo > 0 && Physics.Raycast(shootPos.position, playerDirection, out hit, ShootDistance) && hit.transform.tag == "Player")
         {
             StartCoroutine(shootAnimation(playerDirection));
-            Debug.Log("Flecha creada");
         }
         else if (reloading)
         {
@@ -546,7 +545,7 @@ public class EnemyAgent : MonoBehaviour
             if (shootCoolDown < 0)
             {
                 reloading = false;
-                shootCoolDown = 3.0f;
+                shootCoolDown = 8.0f;
             }
         }
     }
@@ -648,6 +647,13 @@ public class EnemyAgent : MonoBehaviour
 
             var distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
             gameData["distanceToPlayer"] = distanceToPlayer;
+
+            var dir = (player.transform.position - transform.position).normalized;
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, dir, out hit) && hit.transform.tag == "Player")
+                gameData["playerVisible"] =  1.0f;
+            else
+                gameData["playerVisible"] = 0.0f;
         }
         else // Create the game data for the first time
         {
@@ -675,6 +681,13 @@ public class EnemyAgent : MonoBehaviour
 
             var distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
             gameData.Add("distanceToPlayer", distanceToPlayer);
+
+            var dir = (player.transform.position - transform.position).normalized;
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, dir, out hit) && hit.transform.tag == "Player")
+                gameData.Add("playerVisible", 1.0f);
+            else
+                gameData.Add("playerVisible", 0.0f);
         }
     }
 }

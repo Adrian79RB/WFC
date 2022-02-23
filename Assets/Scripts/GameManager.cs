@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public Camera entranceCam;
     public Material cameraMat;
     public GameObject predefinedPath;
+    public GameObject arenaPortal;
 
     public TileSetGenerator tileSetGenerator;
     public GridTile[] predefinedPathNeededTiles;
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour
 
     public void GenerateTileSet()
     {
+        // Set the max steps number of the algorith
         if (tileSetGenerator.tileSet.Count <= 4)
             tileSetGenerator.maxSteps = 15;
         else if(tileSetGenerator.tileSet.Count <= 9)
@@ -34,41 +36,17 @@ public class GameManager : MonoBehaviour
         else if(tileSetGenerator.tileSet.Count <= 13)
             tileSetGenerator.maxSteps = 9;
 
-        var counter = 0;
-        for(int i = 0; i < tileSetGenerator.tileSet.Count; i++)
-        {
-            for (int j = 0; j < predefinedPathNeededTiles.Length; j++)
-            {
-                if (tileSetGenerator.tileSet[i].tile == predefinedPathNeededTiles[j])
-                {
-                    counter++;
-                    break;
-                }
-            }
-        }
+        // Discover if the predefined path can be initialized
+        ActivatePredefinedPath();
 
-        if (counter == predefinedPathNeededTiles.Length)
-            predefinedPath.SetActive(true);
-        else
-            predefinedPath.SetActive(false);
-
+        // Generate the tile map
         tileSetGenerator.Generate();
 
-        var enemyCount = 0;
-        int k = 0;
+        // Activate the Enemies
+        ActivateEnemies();
 
-        while(enemyCount < 4 && k < enemies.Length)
-        {
-            if (!enemies[k].gameObject.activeSelf && Random.value > 0.3)
-            {
-                enemyCount++;
-                enemies[k].gameObject.SetActive(true);
-            }
-
-            k++;
-            if (k >= enemies.Length && enemyCount < 4)
-                k = 0;
-        }
+        // Activate portal
+        arenaPortal.SetActive(true);
     }
 
     public void ClearTileSet()
@@ -80,6 +58,9 @@ public class GameManager : MonoBehaviour
             enemies[i].strategicalPosition.Clear();
             enemies[i].gameObject.SetActive(false);
         }
+
+        // Disactivate arena portal
+        arenaPortal.SetActive(false);
     }
 
     public void AddNewTile(GridTile tile, int weight)
@@ -96,5 +77,45 @@ public class GameManager : MonoBehaviour
         tileToRemove.tile = tile;
         tileToRemove.weight = weight;
         tileSetGenerator.tileSet.Remove(tileToRemove);
+    }
+
+    private void ActivateEnemies()
+    {
+        var enemyCount = 0;
+        int k = 0;
+
+        while (enemyCount < 4 && k < enemies.Length)
+        {
+            if (!enemies[k].gameObject.activeSelf && Random.value > 0.7)
+            {
+                enemyCount++;
+                enemies[k].gameObject.SetActive(true);
+            }
+
+            k++;
+            if (k >= enemies.Length && enemyCount < 4)
+                k = 0;
+        }
+    }
+
+    private void ActivatePredefinedPath()
+    {
+        var counter = 0;
+        for (int i = 0; i < tileSetGenerator.tileSet.Count; i++)
+        {
+            for (int j = 0; j < predefinedPathNeededTiles.Length; j++)
+            {
+                if (tileSetGenerator.tileSet[i].tile == predefinedPathNeededTiles[j])
+                {
+                    counter++;
+                    break;
+                }
+            }
+        }
+
+        if (counter == predefinedPathNeededTiles.Length)
+            predefinedPath.SetActive(true);
+        else
+            predefinedPath.SetActive(false);
     }
 }
