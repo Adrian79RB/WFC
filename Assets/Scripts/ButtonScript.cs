@@ -5,9 +5,10 @@ using UnityEngine;
 public class ButtonScript : MonoBehaviour
 {
     public Light currentlight;
-    public GridTile currentTile;
+    public GridTile[] tiles;
     public int weight;
     public GameManager GM;
+    public Color[] lightColors;
     
     bool buttonPressed;
 
@@ -19,22 +20,31 @@ public class ButtonScript : MonoBehaviour
 
     public void ButtonPressed()
     {
-        if (buttonPressed)
+        if (transform.name.Contains("Set"))
         {
-            currentlight.enabled = false;
-            if (transform.name == "Generate")
-                GM.ClearTileSet();
-            else if (transform.name.Contains("Tile"))
-                GM.ClearTile(currentTile, weight);
+            GM.ChangeTileSet();
+            currentlight.color = lightColors[GM.tileSetChoosen];
         }
         else
         {
-            currentlight.enabled = true;
-            if (transform.name == "Generate")
-                GM.GenerateTileSet();
-            else if (transform.name.Contains("Tile"))
-                GM.AddNewTile(currentTile, weight);
+            if (buttonPressed)
+            {
+                currentlight.enabled = false;
+                if (transform.name == "Generate")
+                    GM.ClearTileSet();
+                else if (transform.name.Contains("Tile"))
+                    GM.ClearTile(tiles[GM.tileSetChoosen], weight);
+            }
+            else
+            {
+                currentlight.enabled = true;
+                if (transform.name == "Generate")
+                    GM.GenerateTileSet();
+                else if (transform.name.Contains("Tile"))
+                    GM.AddNewTile(tiles[GM.tileSetChoosen], weight);
+            }
         }
+
         buttonPressed = !buttonPressed;
     }
 }

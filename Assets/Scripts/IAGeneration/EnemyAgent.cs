@@ -110,7 +110,12 @@ public class EnemyAgent : MonoBehaviour
         homeWaypoint = GameObject.Find("homeWaypoint").transform;
         player = GameObject.Find("Player");
 
-        predefinedPath = tileMap.Find("PredefinedPath");
+        for(int i = 0; i < tileMap.childCount; i++)
+        {
+            if(tileMap.GetChild(i).name.Contains("Predefined") && tileMap.GetChild(i).gameObject.activeSelf)
+                predefinedPath = tileMap.GetChild(i);
+        }
+
         gameObjectGrid = new GameObject[tileMap.GetComponent<TileSetGenerator>().numRow, tileMap.GetComponent<TileSetGenerator>().numCol];
 
         // Initializing the game data structure

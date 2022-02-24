@@ -6,13 +6,21 @@ public class GameManager : MonoBehaviour
 {
     public Camera entranceCam;
     public Material cameraMat;
-    public GameObject predefinedPath;
+    public GameObject[] predefinedPaths;
+    public GameObject[] entrances;
+    public GameObject[] fortress;
     public GameObject arenaPortal;
 
-    public TileSetGenerator tileSetGenerator;
-    public GridTile[] predefinedPathNeededTiles;
-    public EnemyAgent[] enemies;
+    public GridTile[] grassPredefinnedTilesNeeded;
+    public GridTile[] desertPredefinnedTilesNeeded;
+    public GridTile[] snowPredefinnedTilesNeeded;
+    public GridTile[] rarePredefinnedTilesNeeded;
 
+    public TileSetGenerator tileSetGenerator;
+    public EnemyAgent[] enemies;
+    public int tileSetChoosen = 0; // 0 -> Normal; 1 -> Desert; 2 -> Snow; 3 -> Rare
+
+    GridTile[][] predefinedPathNeededTiles;
 
     // Start is called before the first frame update
     void Start()
@@ -24,6 +32,12 @@ public class GameManager : MonoBehaviour
 
         entranceCam.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
         cameraMat.mainTexture = entranceCam.targetTexture;
+
+        predefinedPathNeededTiles = new GridTile[4][];
+        predefinedPathNeededTiles[0] = grassPredefinnedTilesNeeded;
+        predefinedPathNeededTiles[1] = desertPredefinnedTilesNeeded;
+        predefinedPathNeededTiles[2] = snowPredefinnedTilesNeeded;
+        predefinedPathNeededTiles[3] = rarePredefinnedTilesNeeded;
     }
 
     public void GenerateTileSet()
@@ -79,6 +93,13 @@ public class GameManager : MonoBehaviour
         tileSetGenerator.tileSet.Remove(tileToRemove);
     }
 
+    public void ChangeTileSet()
+    {
+        tileSetChoosen++;
+        if (tileSetChoosen > 3)
+            tileSetChoosen = 0;
+    }
+
     private void ActivateEnemies()
     {
         var enemyCount = 0;
@@ -105,7 +126,7 @@ public class GameManager : MonoBehaviour
         {
             for (int j = 0; j < predefinedPathNeededTiles.Length; j++)
             {
-                if (tileSetGenerator.tileSet[i].tile == predefinedPathNeededTiles[j])
+                if (tileSetGenerator.tileSet[i].tile == predefinedPathNeededTiles[tileSetChoosen][j])
                 {
                     counter++;
                     break;
@@ -114,8 +135,13 @@ public class GameManager : MonoBehaviour
         }
 
         if (counter == predefinedPathNeededTiles.Length)
-            predefinedPath.SetActive(true);
+            predefinedPaths[tileSetChoosen].SetActive(true);
         else
-            predefinedPath.SetActive(false);
+            predefinedPaths[tileSetChoosen].SetActive(false);
+
+        tileSetGenerator.predefinedPath = predefinedPaths[tileSetChoosen].transform;
+
+        entrances[tileSetChoosen].SetActive(true);
+        fortress[tileSetChoosen].SetActive(true);
     }
 }

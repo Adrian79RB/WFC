@@ -157,6 +157,8 @@ public class Player : MonoBehaviour
     {
         anim.SetBool("IsAttacking", false);
         anim.SetBool("IsBlocking", false);
+        anim.SetFloat("GoingRight", 0f);
+        anim.SetFloat("GoingForward", 0f);
         anim.SetBool("IsDead", true);
 
         yield return new WaitForSeconds(2.0f);
