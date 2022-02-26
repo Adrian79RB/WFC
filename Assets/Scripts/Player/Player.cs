@@ -71,10 +71,17 @@ public class Player : MonoBehaviour
 
             Vector3 move = transform.right * x + transform.forward * z;
             controller.Move(move * movementSpeed * Time.deltaTime);
-            if (!stepSound.isPlaying)
-                stepSound.Play();
-            else if (z == 0 && x == 0)
+
+            if (z > -0.5f && z < 0.5 && x > -0.5 && x < 0.5 && stepSound.isPlaying)
+            {
                 stepSound.Stop();
+                Debug.Log("Deja de sonar step Player");
+            }
+            else if ( (z < -0.5f || z > 0.5 || x < -0.5 || x > 0.5) && !stepSound.isPlaying)
+            {
+                stepSound.Play();
+                Debug.Log("Suena step player");
+            }
 
             // Jump method
             if (Input.GetButtonDown("Jump") && isGrounded)
@@ -169,7 +176,7 @@ public class Player : MonoBehaviour
                 StartCoroutine("DeadAnimation");
             }
         }
-        else if (isBlocking)
+        else if (isBlocking && !effectSound.isPlaying)
         {
             effectSound.clip = blockSound;
             effectSound.Play();
