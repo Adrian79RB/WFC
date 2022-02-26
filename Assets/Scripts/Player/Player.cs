@@ -27,6 +27,14 @@ public class Player : MonoBehaviour
     public float blockTime;
     public Animator anim;
 
+    [Header("Sound Stuff")]
+    public AudioSource stepSound;
+    public AudioSource effectSound;
+    public AudioClip jumpSound;
+    public AudioClip attackSound;
+    public AudioClip blockSound;
+    public AudioClip hurtSound;
+
     // Movement variables
     bool isGrounded;
     bool isInGenerationRoom;
@@ -63,11 +71,17 @@ public class Player : MonoBehaviour
 
             Vector3 move = transform.right * x + transform.forward * z;
             controller.Move(move * movementSpeed * Time.deltaTime);
+            if (!stepSound.isPlaying)
+                stepSound.Play();
+            else if (z == 0 && x == 0)
+                stepSound.Stop();
 
             // Jump method
             if (Input.GetButtonDown("Jump") && isGrounded)
             {
                 velocity.y = Mathf.Sqrt(jumpHigh * -2f * gravity);
+                effectSound.clip = jumpSound;
+                effectSound.Play();
             }
 
             velocity.y += gravity * Time.deltaTime;
@@ -108,6 +122,8 @@ public class Player : MonoBehaviour
 
     IEnumerator SwordAttack()
     {
+        effectSound.clip = attackSound;
+        effectSound.Play();
         sword.GetComponent<BoxCollider>().enabled = true;
         anim.SetBool("IsAttacking", true);
         yield return new WaitForSeconds(attackTime);
@@ -143,6 +159,8 @@ public class Player : MonoBehaviour
         Debug.Log("Recibe daño. Protegiendo: " + isBlocking);
         if (!isBlocking && !damaged)
         {
+            effectSound.clip = hurtSound;
+            effectSound.Play();
             damaged = true;
             health -= damage;
             if (health <= 0f)
@@ -150,6 +168,11 @@ public class Player : MonoBehaviour
                 health = 0;
                 StartCoroutine("DeadAnimation");
             }
+        }
+        else if (isBlocking)
+        {
+            effectSound.clip = blockSound;
+            effectSound.Play();
         }
     }
 
@@ -160,6 +183,9 @@ public class Player : MonoBehaviour
         anim.SetFloat("GoingRight", 0f);
         anim.SetFloat("GoingForward", 0f);
         anim.SetBool("IsDead", true);
+
+        if (!effectSound.isPlaying)
+            effectSound.Play();
 
         yield return new WaitForSeconds(2.0f);
 

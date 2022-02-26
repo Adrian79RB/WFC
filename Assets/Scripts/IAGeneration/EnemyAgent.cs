@@ -40,6 +40,15 @@ public class EnemyAgent : MonoBehaviour
     [Header("Animation Stuff")]
     public Animator anim;
 
+    [Header("Sound Stuff")]
+    public AudioSource stepSound;
+    public AudioSource effectSound;
+    public AudioClip enemyHurt;
+    public AudioClip enemyAttack;
+    public AudioClip enemyBlock;
+    public AudioClip bowCharge;
+
+
 
     // Game data container to use the BehviourBlocks
     Dictionary<string, float> gameData; // keys: {playerDetected, health, maxHealth, allyNum, ammo, maxAmmo, distanceToPlayer, 
@@ -255,6 +264,9 @@ public class EnemyAgent : MonoBehaviour
                 waypointIndex = 0;
                 currentWaypoint = waypoints[waypointIndex];
                 anim.SetBool("IsMoving", true);
+
+                if(!stepSound.isPlaying)
+                    stepSound.Play();
             }
 
             agent.SetDestination(currentWaypoint.position);
@@ -270,11 +282,17 @@ public class EnemyAgent : MonoBehaviour
 
                     currentWaypoint = waypoints[waypointIndex];
                     anim.SetBool("IsMoving", true);
+
+                    if (!stepSound.isPlaying)
+                        stepSound.Play();
                 }
                 else
                 {
                     agent.isStopped = true;
                     anim.SetBool("IsMoving", false);
+
+                    if (stepSound.isPlaying)
+                        stepSound.Stop();
                 }
             }
             else if (agent.isStopped)// Waiting time until start patrolling again
@@ -291,6 +309,9 @@ public class EnemyAgent : MonoBehaviour
                     waitTimer = 5.0f;
                     agent.isStopped = false;
                     anim.SetBool("IsMoving", true);
+
+                    if (!stepSound.isPlaying)
+                        stepSound.Play();
                 }
             }
         }
@@ -308,7 +329,11 @@ public class EnemyAgent : MonoBehaviour
                 agent.isStopped = false;
 
             currentWaypoint = homeWaypoint;
+            anim.SetBool("IsMoving", true);
             retreating = true;
+
+            if (!stepSound.isPlaying)
+                stepSound.Play();
         }
 
         // Selecting an Strategical position in the fortificate area
@@ -368,6 +393,8 @@ public class EnemyAgent : MonoBehaviour
             }
 
             anim.SetBool("IsMoving", true);
+            if (!stepSound.isPlaying)
+                stepSound.Play();
         }
 
         agent.SetDestination(currentWaypoint.position);
@@ -377,6 +404,8 @@ public class EnemyAgent : MonoBehaviour
         {
             agent.isStopped = true;
             anim.SetBool("IsMoving", false);
+            if (stepSound.isPlaying)
+                stepSound.Stop();
             RotateEnemy(player.transform.position);
         }
     }
@@ -420,6 +449,8 @@ public class EnemyAgent : MonoBehaviour
                 }
 
                 anim.SetBool("IsMoving", true);
+                if (!stepSound.isPlaying)
+                    stepSound.Play();
             }
 
             agent.SetDestination(nextPos);
@@ -430,6 +461,9 @@ public class EnemyAgent : MonoBehaviour
                 anim.SetBool("IsMoving", false);
                 agent.isStopped = true;
                 strategicallyHide = true;
+
+                if (stepSound.isPlaying)
+                    stepSound.Stop();
             }
         }
         else
@@ -452,6 +486,9 @@ public class EnemyAgent : MonoBehaviour
 
         if(!anim.GetBool("IsMoving"))
             anim.SetBool("IsMoving", true);
+
+        if (!stepSound.isPlaying)
+            stepSound.Play();
 
         agent.SetDestination(futurePlayerPosition);
 
@@ -481,12 +518,20 @@ public class EnemyAgent : MonoBehaviour
 
             if (!anim.GetBool("IsMoving"))
                 anim.SetBool("IsMoving", true);
+            if (!stepSound.isPlaying)
+                stepSound.Play();
+
             agent.SetDestination(targetPos);
 
             if (Vector3.Distance(transform.position, targetPos) < agent.stoppingDistance)
             {
                 gettingAway = false;
                 agent.isStopped = true;
+
+                if (anim.GetBool("IsMoving"))
+                    anim.SetBool("IsMoving", false);
+                if (stepSound.isPlaying)
+                    stepSound.Stop();
             }
         }
     }
@@ -500,6 +545,9 @@ public class EnemyAgent : MonoBehaviour
 
             currentWaypoint = player.transform;
             anim.SetBool("IsMoving", true);
+            if (!stepSound.isPlaying)
+                stepSound.Play();
+
             agent.SetDestination(currentWaypoint.position);
         }
         else if(!isAttacking && !isBlocking)
@@ -508,6 +556,9 @@ public class EnemyAgent : MonoBehaviour
                 agent.isStopped = true;
 
             anim.SetBool("IsMoving", false);
+            if (stepSound.isPlaying)
+                stepSound.Stop();
+
             var randomValue = UnityEngine.Random.value;
             if ( randomValue > 0.6) // Attack the player
             {
@@ -524,8 +575,11 @@ public class EnemyAgent : MonoBehaviour
 
     internal void Shoot()
     {
+        // The enemy stops moving
         if (anim.GetBool("IsMoving"))
             anim.SetBool("IsMoving", false);
+        if (stepSound.isPlaying)
+            stepSound.Stop();
 
         if (!anim.GetBool("IsAiming"))
             anim.SetBool("IsAiming", true);
@@ -559,10 +613,18 @@ public class EnemyAgent : MonoBehaviour
     {
         if (!isBlocking && !damaged)
         {
+            effectSound.clip = enemyHurt;
+            effectSound.Play();
+
             damaged = true;
             health -= damage;
             if (health <= 0f)
                 StartCoroutine("DeathAnimation");
+        }
+        else if (isBlocking)
+        {
+            effectSound.clip = enemyBlock;
+            effectSound.Play();
         }
     }
 
@@ -582,6 +644,9 @@ public class EnemyAgent : MonoBehaviour
 
     IEnumerator attackAnimation()
     {
+        effectSound.clip = enemyAttack;
+        effectSound.Play();
+
         isAttacking = true;
         sword.GetComponent<BoxCollider>().enabled = true;
         anim.SetBool("IsAttacking", true);
@@ -602,6 +667,9 @@ public class EnemyAgent : MonoBehaviour
 
     IEnumerator shootAnimation(Vector3 playerDirection)
     {
+        effectSound.clip = bowCharge;
+        effectSound.Play();
+
         anim.SetBool("IsShooting", true);
         Rigidbody rgbdArrow = Instantiate(arrow, shootPos.position, shootPos.rotation, shootPos).GetComponent<Rigidbody>();
         rgbdArrow.AddForce(playerDirection * shootForce, ForceMode.Impulse);
@@ -625,7 +693,11 @@ public class EnemyAgent : MonoBehaviour
             anim.SetBool("IsBlocking", false);
             anim.SetBool("IsAttacking", false);
         }
+
         anim.SetBool("IsDead", true);
+        if (!effectSound.isPlaying)
+            effectSound.Play();
+
         yield return new WaitForSeconds(2.0f);
         gameObject.SetActive(false);
     }

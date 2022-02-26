@@ -9,7 +9,8 @@ public class ButtonScript : MonoBehaviour
     public int weight;
     public GameManager GM;
     public Color[] lightColors;
-    
+    public AudioSource buttonSound;
+
     bool buttonPressed;
 
     // Start is called before the first frame update
@@ -20,6 +21,8 @@ public class ButtonScript : MonoBehaviour
 
     public void ButtonPressed()
     {
+        buttonSound.Play();
+
         if (transform.name.Contains("Set"))
         {
             GM.ChangeTileSet();
