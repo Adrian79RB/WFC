@@ -10,8 +10,7 @@ public class ButtonScript : MonoBehaviour
     public GameManager GM;
     public Color[] lightColors;
     public AudioSource buttonSound;
-
-    bool buttonPressed;
+    public bool buttonPressed;
 
     // Start is called before the first frame update
     void Start()

@@ -11,6 +11,9 @@ public class EnemyAgent : MonoBehaviour
     [Header("Select Enemy Type")]
     public EnemyType type;
 
+    [Header("Game Manager")]
+    public GameManager GM;
+
     [Header("Making Decisions")]
     // Constants used to decide in the tree
     public float maxHealth;
@@ -47,6 +50,7 @@ public class EnemyAgent : MonoBehaviour
     public AudioClip enemyAttack;
     public AudioClip enemyBlock;
     public AudioClip bowCharge;
+    public AudioClip[] stepsSoundEffect;
 
 
 
@@ -133,6 +137,8 @@ public class EnemyAgent : MonoBehaviour
 
         GetGameObjectGrid();
         GetStrategicalPositions();
+
+        stepSound.clip = stepsSoundEffect[GM.tileSetChoosen];
     }
 
     private void DebugArbol()

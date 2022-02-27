@@ -4,21 +4,27 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    [Header("Portal Stuff")]
     public Camera entranceCam;
     public Material cameraMat;
+    public GameObject arenaPortal;
+
+    [Header("Map types Stuff")]
     public GameObject[] predefinedPaths;
     public GameObject[] entrances;
     public GameObject[] fortress;
-    public GameObject arenaPortal;
 
+    [Header("Predefine tiles needed")]
     public GridTile[] grassPredefinnedTilesNeeded;
     public GridTile[] desertPredefinnedTilesNeeded;
     public GridTile[] snowPredefinnedTilesNeeded;
     public GridTile[] rarePredefinnedTilesNeeded;
 
+    [Header("Other Stuff")]
     public TileSetGenerator tileSetGenerator;
     public EnemyAgent[] enemies;
     public int tileSetChoosen = 0; // 0 -> Normal; 1 -> Desert; 2 -> Snow; 3 -> Rare
+    public GameObject[] buttons;
 
     GridTile[][] predefinedPathNeededTiles;
 
@@ -93,8 +99,23 @@ public class GameManager : MonoBehaviour
         tileSetGenerator.tileSet.Remove(tileToRemove);
     }
 
+    public void DeactivateAllButtons()
+    {
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            Debug.Log("Entra bucle");
+            ButtonScript button = buttons[i].GetComponent<ButtonScript>();
+            Debug.Log("Boton: " + button.name + "; activate: " + button.buttonPressed);
+            if (button.buttonPressed)
+            {
+                button.ButtonPressed(); // Imitates that the player press again the button and deactivate them
+            }
+        }
+    }
+
     public void ChangeTileSet()
     {
+        DeactivateAllButtons();
         tileSetChoosen++;
         if (tileSetChoosen > 3)
             tileSetChoosen = 0;

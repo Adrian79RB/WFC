@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
+    [Header("Game Manager")]
+    public GameManager GM;
+
     [Header("Player Stats")]
     public float health;
     public float movementSpeed;
@@ -34,6 +37,8 @@ public class Player : MonoBehaviour
     public AudioClip attackSound;
     public AudioClip blockSound;
     public AudioClip hurtSound;
+    public AudioClip[] stepSoundsClip;
+    public AudioClip concreteStep;
 
     // Movement variables
     bool isGrounded;
@@ -51,6 +56,7 @@ public class Player : MonoBehaviour
     {
         isInGenerationRoom = true;
         playerCamera = transform.Find("Main Camera");
+        stepSound.clip = concreteStep;
     }
 
     // Update is called once per frame
@@ -75,12 +81,10 @@ public class Player : MonoBehaviour
             if (z > -0.5f && z < 0.5 && x > -0.5 && x < 0.5 && stepSound.isPlaying)
             {
                 stepSound.Stop();
-                Debug.Log("Deja de sonar step Player");
             }
             else if ( (z < -0.5f || z > 0.5 || x < -0.5 || x > 0.5) && !stepSound.isPlaying)
             {
                 stepSound.Play();
-                Debug.Log("Suena step player");
             }
 
             // Jump method
@@ -150,6 +154,7 @@ public class Player : MonoBehaviour
     public void PortalTeleport(Vector3 newPos)
     {
         transform.position = newPos;
+        stepSound.clip = stepSoundsClip[GM.tileSetChoosen];
         StartCoroutine("ActivateCharacterController");
     }
 
