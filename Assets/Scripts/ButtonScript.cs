@@ -11,6 +11,7 @@ public class ButtonScript : MonoBehaviour
     public Color[] lightColors;
     public AudioSource buttonSound;
     public bool buttonPressed;
+    public RotateTilesExposition rotableTile;
 
     // Start is called before the first frame update
     void Start()
@@ -35,7 +36,10 @@ public class ButtonScript : MonoBehaviour
                 if (transform.name == "Generate")
                     GM.ClearTileSet();
                 else if (transform.name.Contains("Tile"))
+                {
                     GM.ClearTile(tiles[GM.tileSetChoosen], weight);
+                    rotableTile.rotate = false;
+                }
             }
             else
             {
@@ -43,7 +47,10 @@ public class ButtonScript : MonoBehaviour
                 if (transform.name == "Generate")
                     GM.GenerateTileSet();
                 else if (transform.name.Contains("Tile"))
+                {
                     GM.AddNewTile(tiles[GM.tileSetChoosen], weight);
+                    rotableTile.rotate = true;
+                }
             }
         }
 

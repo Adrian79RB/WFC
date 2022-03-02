@@ -25,7 +25,7 @@ public class EnemyAgent : MonoBehaviour
 
     // Behaviour block Set
     [Header("Block Set")]
-    public Block[] enemyBlockSet;
+    public List<Block> enemyBlockSet;
 
     // Enemy Functional stuff
     [Header("Enemy Functionality stuff")]
@@ -77,9 +77,10 @@ public class EnemyAgent : MonoBehaviour
     float shootCoolDown = 8.0f;
     bool reloading = false;
     bool gettingAway = true;
+    bool headingPlayer = false;
 
     // Variables that check the gameData Update
-    float gameDataUpdateTimer = 2.5f;
+    float gameDataUpdateTimer = 2.0f;
     float gameDataUpdateTime = 0.0f;
 
     // BehaviourGenerator and BehaviourTree
@@ -100,7 +101,12 @@ public class EnemyAgent : MonoBehaviour
     {
         // Creating the Decision Tree
         treeGenerator = new BehaviourBlockGeneration();
-        treeGenerator.blockSet = enemyBlockSet;
+        treeGenerator.blockSet = enemyBlockSet.ToArray();
+        if (rootBlock != null)
+        {
+            ClearBlockTree(rootBlock);
+            treeGenerator.ClearTree();
+        }
 
         while (rootBlock == null)
         {
@@ -159,6 +165,17 @@ public class EnemyAgent : MonoBehaviour
         }
 
         currentBlock = rootBlock;
+    }
+
+    private void ClearBlockTree(BehaviourBlock block)
+    {
+        for (int i = 0; i < block.children.Count; i++)
+        {
+            ClearBlockTree(block.children[i]);
+        }
+
+        block.children.Clear();
+        block = null;
     }
 
     private void GetGameObjectGrid()
@@ -238,6 +255,8 @@ public class EnemyAgent : MonoBehaviour
             retreating = false;
         else if (currentBlock.ToString() != "StrategicPositioning" && strategicallyHide)
             strategicallyHide = false;
+        else if (currentBlock.ToString() != "GetClose" && headingPlayer)
+            headingPlayer = false;
 
         if (damaged)
         {
@@ -328,6 +347,7 @@ public class EnemyAgent : MonoBehaviour
     /// </summary>
     internal void RetreatToHome()
     {
+        Debug.Log("Is Retreating");
         // Going to the Fortificate position in the arena
         if(currentWaypoint != homeWaypoint && !retreating)
         {
@@ -340,6 +360,8 @@ public class EnemyAgent : MonoBehaviour
 
             if (!stepSound.isPlaying)
                 stepSound.Play();
+
+            Debug.Log("Moving to home");
         }
 
         // Selecting an Strategical position in the fortificate area
@@ -373,6 +395,7 @@ public class EnemyAgent : MonoBehaviour
             }
             else
             {
+                Debug.Log("Select Home position");
                 var closestPosition = Mathf.Infinity;
                 for (int i = 0; i < homePositions.Count; i++)
                 {
@@ -408,6 +431,8 @@ public class EnemyAgent : MonoBehaviour
         // Waiting for the player to arrive
         if (currentWaypoint != homeWaypoint && Vector3.Distance(transform.position, currentWaypoint.position) < agent.stoppingDistance)
         {
+            Debug.Log("Waiting in home");
+            
             agent.isStopped = true;
             anim.SetBool("IsMoving", false);
             if (stepSound.isPlaying)
@@ -423,6 +448,7 @@ public class EnemyAgent : MonoBehaviour
     {
         if (!strategicallyHide)
         {
+            Debug.Log("Searching strategical position");
             if (agent.isStopped)
                 agent.isStopped = false;
 
@@ -430,6 +456,7 @@ public class EnemyAgent : MonoBehaviour
             // Searching a strategical position in the arena
             if (!strategicalPosition.Contains(agent.destination))
             {
+                Debug.Log("Selecting best position");
                 var bestDistance = Mathf.Infinity;
                 for (int i = 0; i < strategicalPosition.Count; i++)
                 {
@@ -459,11 +486,13 @@ public class EnemyAgent : MonoBehaviour
                     stepSound.Play();
             }
 
+            Debug.Log("Going to position");
             agent.SetDestination(nextPos);
 
             // Waiting the player to arrive
             if (Vector3.Distance(transform.position, nextPos) < 1f)
             {
+                Debug.Log("Stoping at strategical position");
                 anim.SetBool("IsMoving", false);
                 agent.isStopped = true;
                 strategicallyHide = true;
@@ -474,6 +503,7 @@ public class EnemyAgent : MonoBehaviour
         }
         else
         {
+            Debug.Log("Waiting on strategical position");
             var pos = new Vector3(player.transform.position.x, player.transform.position.y + .5f, player.transform.position.z);
             RotateEnemy(pos);
         }
@@ -484,24 +514,43 @@ public class EnemyAgent : MonoBehaviour
     /// </summary>
     internal void GetCloseToPlayer()
     {
-        if (agent.isStopped)
-            agent.isStopped = false;
-
-        float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
-        Vector3 futurePlayerPosition = player.transform.position + player.transform.forward * player.GetComponent<Player>().movementSpeed * time; // Future position of the player in that time
-
-        if(!anim.GetBool("IsMoving"))
-            anim.SetBool("IsMoving", true);
-
-        if (!stepSound.isPlaying)
-            stepSound.Play();
-
-        agent.SetDestination(futurePlayerPosition);
-
-        // If the enemy is close enought go for the player
-        if (Vector3.Distance(transform.position, futurePlayerPosition) >= gameData["distanceToPlayer"])
+        Debug.Log("Geting close to player");
+        if(!headingPlayer)
         {
+            if (agent.isStopped)
+                agent.isStopped = false;
+
+            float time = gameData["distanceToPlayer"] / agent.speed; // Time that las the enemy to arrive to the player
+            Debug.Log("Player velocity: " + (player.GetComponent<Player>().movement * player.GetComponent<Player>().movementSpeed) + "; time: " + time);
+
+            Vector3 futurePlayerPosition = player.transform.position + player.GetComponent<Player>().movement * player.GetComponent<Player>().movementSpeed * time; // Future position of the player in that time
+
+            if (!anim.GetBool("IsMoving"))
+                anim.SetBool("IsMoving", true);
+
+            if (!stepSound.isPlaying)
+                stepSound.Play();
+
+            agent.SetDestination(futurePlayerPosition);
+
+            Debug.Log("Player pos: " + player.transform.position + "; future player pos: " + futurePlayerPosition);
+            Debug.Log("Heading to future pos");
+
+            // If the enemy is close enought go for the player
+            if (Vector3.Distance(transform.position, futurePlayerPosition) >= gameData["distanceToPlayer"])
+            {
+                agent.SetDestination(player.transform.position);
+                headingPlayer = true;
+            }
+        }
+        else
+        {
+            if (!anim.GetBool("IsMoving"))
+                anim.SetBool("IsMoving", true);
+
+            Debug.Log("Heading player");
             agent.SetDestination(player.transform.position);
+            RotateEnemy(player.transform.position);
         }
     }
 
@@ -544,11 +593,14 @@ public class EnemyAgent : MonoBehaviour
 
     internal void Attack()
     {
+        Debug.Log("Attack");
+
         if (gameData["distanceToPlayer"] > 1.7f) // Get to hit distance of the player 
         {
             if (agent.isStopped)
                 agent.isStopped = false;
 
+            Debug.Log("Getting close to player");
             currentWaypoint = player.transform;
             anim.SetBool("IsMoving", true);
             if (!stepSound.isPlaying)
@@ -558,6 +610,7 @@ public class EnemyAgent : MonoBehaviour
         }
         else if(!isAttacking && !isBlocking)
         {
+            Debug.Log("Offensive");
             if (!agent.isStopped)
                 agent.isStopped = true;
 
@@ -566,12 +619,14 @@ public class EnemyAgent : MonoBehaviour
                 stepSound.Stop();
 
             var randomValue = UnityEngine.Random.value;
-            if ( randomValue > 0.6) // Attack the player
+            if ( randomValue > 0.7) // Attack the player
             {
+                Debug.Log("Sword Attack");
                 StartCoroutine("attackAnimation");
             }
-            else if(randomValue < 0.3 && !isBlocking) // Block the player attack
+            else if(randomValue < 0.3) // Block the player attack
             {
+                Debug.Log("Shield Block");
                 StartCoroutine("blockAnimation");
             }
             var pos = new Vector3(player.transform.position.x, player.transform.position.y + .5f, player.transform.position.z);
@@ -733,7 +788,7 @@ public class EnemyAgent : MonoBehaviour
 
             var dir = (player.transform.position - transform.position).normalized;
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, dir, out hit) && hit.transform.tag == "Player")
+            if (Physics.Raycast(shootPos.position, dir, out hit) && hit.transform.tag == "Player")
                 gameData["playerVisible"] =  1.0f;
             else
                 gameData["playerVisible"] = 0.0f;
@@ -767,7 +822,7 @@ public class EnemyAgent : MonoBehaviour
 
             var dir = (player.transform.position - transform.position).normalized;
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, dir, out hit) && hit.transform.tag == "Player")
+            if (Physics.Raycast(shootPos.position, dir, out hit) && hit.transform.tag == "Player")
                 gameData.Add("playerVisible", 1.0f);
             else
                 gameData.Add("playerVisible", 0.0f);

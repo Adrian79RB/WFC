@@ -193,6 +193,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
+  GM: {fileID: 0}
   maxHealth: 10
   maxAmmo: 5
   safeDistance: 6
@@ -235,6 +236,7 @@ MonoBehaviour:
   enemyAttack: {fileID: 8300000, guid: f9bb8c43782697a46b8ef22d32b583c2, type: 3}
   enemyBlock: {fileID: 8300000, guid: 0d628f53a0aebe0439ebaa7c749127b6, type: 3}
   bowCharge: {fileID: 8300000, guid: 7b13ea72e9667ae46be261652eede69d, type: 3}
+  stepsSoundEffect: []
   playerDetected: 0
 --- !u!82 &6225027367015794228
 AudioSource:
@@ -248,7 +250,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: df25e50ec3ddff3449ecd058039942b4, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.6
   m_Pitch: 1
   Loop: 1
   Mute: 0

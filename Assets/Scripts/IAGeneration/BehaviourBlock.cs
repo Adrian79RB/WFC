@@ -114,7 +114,6 @@ public class GetClose : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        //Debug.Log("I am " + this.ToString() + "; player detected: " + gameData["playerDetected"] + "; distance to player: " + gameData["distanceToPlayer"] + "; attack distance: " + gameData["AttackDistance"]);
         return gameData["playerDetected"] == 1f && gameData["distanceToPlayer"] < gameData["AttackDistance"];
     }
 

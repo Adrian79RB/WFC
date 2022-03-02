@@ -15,6 +15,7 @@ public class Player : MonoBehaviour
     public float gravity = -9.81f;
     public float jumpHigh = 3.0f;
     public CharacterController controller;
+    [HideInInspector]public Vector3 movement;
     
     [Header("Ground Check")]
     public Transform groundCheck;
@@ -75,8 +76,8 @@ public class Player : MonoBehaviour
             anim.SetFloat("GoingRight", x);
             anim.SetFloat("GoingForward", z);
 
-            Vector3 move = transform.right * x + transform.forward * z;
-            controller.Move(move * movementSpeed * Time.deltaTime);
+            movement = transform.right * x + transform.forward * z;
+            controller.Move(movement * movementSpeed * Time.deltaTime);
 
             if (z > -0.5f && z < 0.5 && x > -0.5 && x < 0.5 && stepSound.isPlaying)
             {
@@ -106,7 +107,10 @@ public class Player : MonoBehaviour
                 RaycastHit hit;
                 if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, rayDistance, LayerMask.GetMask("InteractuableObject")))
                 {
-                    hit.transform.GetComponent<ButtonScript>().ButtonPressed();
+                    if (hit.transform.GetComponent<ButtonScript>() != null)
+                        hit.transform.GetComponent<ButtonScript>().ButtonPressed();
+                    else if (hit.transform.GetComponent<BehaviourButton>())
+                        hit.transform.GetComponent<BehaviourButton>().ButtonPressed();
                 }
             }
             else

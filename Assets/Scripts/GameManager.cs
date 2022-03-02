@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,6 +28,8 @@ public class GameManager : MonoBehaviour
     public GameObject[] buttons;
 
     GridTile[][] predefinedPathNeededTiles;
+    List<Block> behaviourBlockSelectedArchers;
+    List<Block> behaviourBlockSelectedSwordman;
 
     // Start is called before the first frame update
     void Start()
@@ -44,6 +47,9 @@ public class GameManager : MonoBehaviour
         predefinedPathNeededTiles[1] = desertPredefinnedTilesNeeded;
         predefinedPathNeededTiles[2] = snowPredefinnedTilesNeeded;
         predefinedPathNeededTiles[3] = rarePredefinnedTilesNeeded;
+
+        behaviourBlockSelectedArchers = new List<Block>();
+        behaviourBlockSelectedSwordman = new List<Block>();
     }
 
     public void GenerateTileSet()
@@ -64,6 +70,7 @@ public class GameManager : MonoBehaviour
 
         // Activate the Enemies
         ActivateEnemies();
+        //enemies[0].gameObject.SetActive(true);
 
         // Activate portal
         arenaPortal.SetActive(true);
@@ -91,6 +98,29 @@ public class GameManager : MonoBehaviour
         tileSetGenerator.tileSet.Add(newTile);
     }
 
+    public void AddNewBlock(BlockType[] type, int weight)
+    {
+        Block newBlock = new Block();
+        newBlock.weight = weight;
+        if (type.Length == 1)
+        {
+            newBlock.type = type[0];
+            behaviourBlockSelectedArchers.Add(newBlock);
+            behaviourBlockSelectedSwordman.Add(newBlock);
+        }
+        else
+        {
+            for (int i = 0; i < type.Length; i++)
+            {
+                newBlock.type = type[i];
+                if (type[i] == BlockType.GetClose || type[i] == BlockType.Attack)
+                    behaviourBlockSelectedSwordman.Add(newBlock);
+                else
+                    behaviourBlockSelectedArchers.Add(newBlock);
+            }
+        }
+    }
+
     public void ClearTile(GridTile tile, int weight)
     {
         Tile tileToRemove = new Tile();
@@ -99,13 +129,34 @@ public class GameManager : MonoBehaviour
         tileSetGenerator.tileSet.Remove(tileToRemove);
     }
 
+    public void ClearBlock(BlockType[] type, int weight)
+    {
+        Block blockToRemove = new Block();
+        blockToRemove.weight = weight;
+        if(type.Length == 1)
+        {
+            blockToRemove.type = type[0];
+            behaviourBlockSelectedArchers.Remove(blockToRemove);
+            behaviourBlockSelectedSwordman.Remove(blockToRemove);
+        }
+        else
+        {
+            for (int i = 0; i < type.Length; i++)
+            {
+                blockToRemove.type = type[i];
+                if (type[i] == BlockType.GetClose || type[i] == BlockType.Attack)
+                    behaviourBlockSelectedSwordman.Remove(blockToRemove);
+                else
+                    behaviourBlockSelectedArchers.Remove(blockToRemove);
+            }
+        }
+    }
+
     public void DeactivateAllButtons()
     {
         for (int i = 0; i < buttons.Length; i++)
         {
-            Debug.Log("Entra bucle");
             ButtonScript button = buttons[i].GetComponent<ButtonScript>();
-            Debug.Log("Boton: " + button.name + "; activate: " + button.buttonPressed);
             if (button.buttonPressed)
             {
                 button.ButtonPressed(); // Imitates that the player press again the button and deactivate them
@@ -128,9 +179,22 @@ public class GameManager : MonoBehaviour
 
         while (enemyCount < 4 && k < enemies.Length)
         {
-            if (!enemies[k].gameObject.activeSelf && Random.value > 0.7)
+            if (!enemies[k].gameObject.activeSelf && UnityEngine.Random.value > 0.7)
             {
                 enemyCount++;
+                if (enemies[k].type == EnemyType.Archer)
+                {
+                    Debug.Log("Behaviour block: " + behaviourBlockSelectedArchers.Count);
+                    enemies[k].enemyBlockSet = behaviourBlockSelectedArchers;
+                    Debug.Log("Enemy Block set: " + enemies[k].enemyBlockSet.Count);
+                }
+                else
+                {
+                    Debug.Log("Behaviour block: " + behaviourBlockSelectedSwordman.Count);
+                    enemies[k].enemyBlockSet = behaviourBlockSelectedSwordman;
+                    Debug.Log("Enemy Block set: " + enemies[k].enemyBlockSet.Count);
+                }
+
                 enemies[k].gameObject.SetActive(true);
             }
 
