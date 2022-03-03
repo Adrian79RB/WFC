@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour
     public EnemyAgent[] enemies;
     public int tileSetChoosen = 0; // 0 -> Normal; 1 -> Desert; 2 -> Snow; 3 -> Rare
     public GameObject[] buttons;
+    public GameObject generateButton;
 
     GridTile[][] predefinedPathNeededTiles;
     List<Block> behaviourBlockSelectedArchers;
@@ -96,6 +97,11 @@ public class GameManager : MonoBehaviour
         newTile.tile = tile;
         newTile.weight = weight;
         tileSetGenerator.tileSet.Add(newTile);
+        if (tileSetGenerator.tileSet.Count > 6 && behaviourBlockSelectedArchers.Count > 2 && behaviourBlockSelectedSwordman.Count > 2)
+        {
+            if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
+                generateButton.GetComponent<ButtonScript>().ActivateLight();
+        }
     }
 
     public void AddNewBlock(BlockType[] type, int weight)
@@ -119,6 +125,12 @@ public class GameManager : MonoBehaviour
                     behaviourBlockSelectedArchers.Add(newBlock);
             }
         }
+
+        if (tileSetGenerator.tileSet.Count > 6 && behaviourBlockSelectedArchers.Count > 2 && behaviourBlockSelectedSwordman.Count > 2)
+        {
+            if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
+                generateButton.GetComponent<ButtonScript>().ActivateLight();
+        }
     }
 
     public void ClearTile(GridTile tile, int weight)
@@ -127,6 +139,12 @@ public class GameManager : MonoBehaviour
         tileToRemove.tile = tile;
         tileToRemove.weight = weight;
         tileSetGenerator.tileSet.Remove(tileToRemove);
+
+        if (tileSetGenerator.tileSet.Count < 6 || behaviourBlockSelectedArchers.Count < 3 || behaviourBlockSelectedSwordman.Count < 3)
+        {
+            if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
+                generateButton.GetComponent<ButtonScript>().DiactivateLight();
+        }
     }
 
     public void ClearBlock(BlockType[] type, int weight)
@@ -150,9 +168,24 @@ public class GameManager : MonoBehaviour
                     behaviourBlockSelectedArchers.Remove(blockToRemove);
             }
         }
+
+        if (tileSetGenerator.tileSet.Count < 6 || behaviourBlockSelectedArchers.Count < 3 || behaviourBlockSelectedSwordman.Count < 3)
+        {
+            if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
+                generateButton.GetComponent<ButtonScript>().DiactivateLight();
+        }
     }
 
-    public void DeactivateAllButtons()
+    public void ChangeTileSet()
+    {
+        DeactivateAllButtons();
+        ChangeRotableTiles();
+        tileSetChoosen++;
+        if (tileSetChoosen > 3)
+            tileSetChoosen = 0;
+    }
+
+    private void DeactivateAllButtons()
     {
         for (int i = 0; i < buttons.Length; i++)
         {
@@ -164,12 +197,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void ChangeTileSet()
+    private void ChangeRotableTiles()
     {
-        DeactivateAllButtons();
-        tileSetChoosen++;
-        if (tileSetChoosen > 3)
-            tileSetChoosen = 0;
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            ButtonScript button = buttons[i].GetComponent<ButtonScript>();
+            button.rotableTile[tileSetChoosen].SetActive(false);
+            if (tileSetChoosen < 3)
+                button.rotableTile[tileSetChoosen + 1].SetActive(true);
+            else
+                button.rotableTile[0].SetActive(true);
+        }
     }
 
     private void ActivateEnemies()

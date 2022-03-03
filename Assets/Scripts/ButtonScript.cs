@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,12 +12,19 @@ public class ButtonScript : MonoBehaviour
     public Color[] lightColors;
     public AudioSource buttonSound;
     public bool buttonPressed;
-    public RotateTilesExposition rotableTile;
+    public GameObject[] rotableTile;
+
+    bool buttonActivate;
 
     // Start is called before the first frame update
     void Start()
     {
         buttonPressed = false;
+
+        if (transform.name.Contains("Generate"))
+            buttonActivate = false;
+        else
+            buttonActivate = true;
     }
 
     public void ButtonPressed()
@@ -27,33 +35,58 @@ public class ButtonScript : MonoBehaviour
         {
             GM.ChangeTileSet();
             currentlight.color = lightColors[GM.tileSetChoosen];
+
         }
         else
         {
             if (buttonPressed)
             {
-                currentlight.enabled = false;
-                if (transform.name == "Generate")
+                if (transform.name == "Generate" && buttonActivate)
+                {
                     GM.ClearTileSet();
+                    currentlight.color = lightColors[0];
+                }
                 else if (transform.name.Contains("Tile"))
                 {
+                    currentlight.enabled = false;
                     GM.ClearTile(tiles[GM.tileSetChoosen], weight);
-                    rotableTile.rotate = false;
+                    rotableTile[GM.tileSetChoosen].GetComponent<RotateTilesExposition>().rotate = false;
                 }
             }
             else
             {
-                currentlight.enabled = true;
-                if (transform.name == "Generate")
+                if (transform.name == "Generate" && buttonActivate)
+                {
                     GM.GenerateTileSet();
+                    currentlight.color = lightColors[1];
+                }
                 else if (transform.name.Contains("Tile"))
                 {
+                    currentlight.enabled = true;
                     GM.AddNewTile(tiles[GM.tileSetChoosen], weight);
-                    rotableTile.rotate = true;
+                    rotableTile[GM.tileSetChoosen].GetComponent<RotateTilesExposition>().rotate = true;
                 }
             }
         }
 
-        buttonPressed = !buttonPressed;
+        if(buttonActivate)
+            buttonPressed = !buttonPressed;
+    }
+
+    public void ActivateLight()
+    {
+        if(currentlight.color != lightColors[0])
+            currentlight.color = lightColors[0];
+
+        currentlight.enabled = true;
+        buttonActivate = true;
+    }
+
+    internal void DiactivateLight()
+    {
+        if (currentlight.color != lightColors[0])
+            currentlight.color = lightColors[0];
+        currentlight.enabled = false;
+        buttonActivate = false;
     }
 }
