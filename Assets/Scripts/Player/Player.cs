@@ -207,4 +207,9 @@ public class Player : MonoBehaviour
 
         SceneManager.LoadScene("Scene1");
     }
+
+    public bool IsPlayerOnRoom()
+    {
+        return isInGenerationRoom;
+    }
 }
