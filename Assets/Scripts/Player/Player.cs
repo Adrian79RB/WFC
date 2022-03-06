@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -41,6 +42,13 @@ public class Player : MonoBehaviour
     public AudioClip[] stepSoundsClip;
     public AudioClip concreteStep;
 
+    [Header("Weapon GUI Stuff")]
+    public GameObject handGUI;
+    public GameObject swordGUI;
+    public GameObject shieldGUI;
+    public GameObject fingerGUI;
+    public RectTransform lifeBar;
+
     // Movement variables
     bool isGrounded;
     bool isInGenerationRoom;
@@ -53,9 +61,16 @@ public class Player : MonoBehaviour
     float damageTime = 0;
     bool damaged = false;
 
+    // GUI variables
+    bool weaponGUIisChanging;
+    float originalLifeBarWidth;
+
     private void Start()
     {
         isInGenerationRoom = true;
+        weaponGUIisChanging = false;
+        originalLifeBarWidth = lifeBar.sizeDelta.x;
+
         playerCamera = transform.Find("Main Camera");
         stepSound.clip = concreteStep;
     }
@@ -104,6 +119,8 @@ public class Player : MonoBehaviour
         {
             if (isInGenerationRoom)
             {
+                if(!weaponGUIisChanging)
+                    StartCoroutine(ChangeWeaponGUI(handGUI, fingerGUI));
                 RaycastHit hit;
                 if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, rayDistance, LayerMask.GetMask("InteractuableObject")))
                 {
@@ -116,12 +133,16 @@ public class Player : MonoBehaviour
             else
             {
                 StartCoroutine("SwordAttack");
+                if(!weaponGUIisChanging)
+                    StartCoroutine(ChangeWeaponGUI(swordGUI, swordGUI));
             }
         }
 
         if (Input.GetMouseButtonDown(1))
         {
             StartCoroutine("SwordBlock");
+            if(!weaponGUIisChanging)
+                StartCoroutine(ChangeWeaponGUI(swordGUI, shieldGUI));
         }
 
         if (damaged)
@@ -159,6 +180,8 @@ public class Player : MonoBehaviour
     {
         transform.position = newPos;
         stepSound.clip = stepSoundsClip[GM.tileSetChoosen];
+        handGUI.SetActive(false);
+        swordGUI.SetActive(true);
         StartCoroutine("ActivateCharacterController");
     }
 
@@ -179,17 +202,36 @@ public class Player : MonoBehaviour
             effectSound.Play();
             damaged = true;
             health -= damage;
+
             if (health <= 0f)
             {
                 health = 0;
                 StartCoroutine("DeadAnimation");
             }
+
+            ChangeLifeBarGUI();
         }
         else if (isBlocking && !effectSound.isPlaying)
         {
             effectSound.clip = blockSound;
             effectSound.Play();
         }
+    }
+
+    private void ChangeLifeBarGUI()
+    {
+        float newWidth = lifeBar.sizeDelta.x * health / 10f;
+        float xOffset = lifeBar.sizeDelta.x - newWidth;
+
+        lifeBar.sizeDelta = new Vector2(newWidth, lifeBar.sizeDelta.y);
+        lifeBar.position = new Vector3( lifeBar.position.x + 10 - xOffset/2, lifeBar.position.y, lifeBar.position.z);
+
+        if (health > 6)
+            lifeBar.gameObject.GetComponent<Image>().color = Color.green;
+        else if (health > 3)
+            lifeBar.gameObject.GetComponent<Image>().color = Color.yellow;
+        else
+            lifeBar.gameObject.GetComponent<Image>().color = Color.red;
     }
 
     IEnumerator DeadAnimation()
@@ -206,6 +248,19 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(2.0f);
 
         SceneManager.LoadScene("Scene1");
+    }
+
+    IEnumerator ChangeWeaponGUI(GameObject currentGUI, GameObject nextGUI)
+    {
+        weaponGUIisChanging = true;
+        currentGUI.SetActive(false);
+        nextGUI.SetActive(true);
+        nextGUI.GetComponent<Animator>().SetBool("IsActive", true);
+        yield return new WaitForSeconds(1.5f);
+        nextGUI.GetComponent<Animator>().SetBool("IsActive", false);
+        nextGUI.SetActive(false);
+        currentGUI.SetActive(true);
+        weaponGUIisChanging = false;
     }
 
     public bool IsPlayerOnRoom()
