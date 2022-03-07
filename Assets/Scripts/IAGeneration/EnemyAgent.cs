@@ -180,7 +180,7 @@ public class EnemyAgent : MonoBehaviour
 
     private void GetGameObjectGrid()
     {
-        if (predefinedPath.gameObject.activeSelf)
+        if (predefinedPath != null && predefinedPath.gameObject.activeSelf)
         {
             for (int i = 0; i < predefinedPath.childCount; i++)
             {

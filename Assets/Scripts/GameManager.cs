@@ -59,9 +59,9 @@ public class GameManager : MonoBehaviour
         if (tileSetGenerator.tileSet.Count <= 4)
             tileSetGenerator.maxSteps = 15;
         else if(tileSetGenerator.tileSet.Count <= 9)
-            tileSetGenerator.maxSteps = 12;
+            tileSetGenerator.maxSteps = 10; // 12
         else if(tileSetGenerator.tileSet.Count <= 13)
-            tileSetGenerator.maxSteps = 9;
+            tileSetGenerator.maxSteps = 9; // 9
 
         // Discover if the predefined path can be initialized
         ActivatePredefinedPath();
@@ -140,7 +140,7 @@ public class GameManager : MonoBehaviour
         tileToRemove.weight = weight;
         tileSetGenerator.tileSet.Remove(tileToRemove);
 
-        if (tileSetGenerator.tileSet.Count < 6 || behaviourBlockSelectedArchers.Count < 3 || behaviourBlockSelectedSwordman.Count < 3)
+        if (tileSetGenerator.tileSet.Count <= 6 || behaviourBlockSelectedArchers.Count < 3 || behaviourBlockSelectedSwordman.Count < 3)
         {
             if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().DiactivateLight();
@@ -222,15 +222,11 @@ public class GameManager : MonoBehaviour
                 enemyCount++;
                 if (enemies[k].type == EnemyType.Archer)
                 {
-                    Debug.Log("Behaviour block: " + behaviourBlockSelectedArchers.Count);
                     enemies[k].enemyBlockSet = behaviourBlockSelectedArchers;
-                    Debug.Log("Enemy Block set: " + enemies[k].enemyBlockSet.Count);
                 }
                 else
                 {
-                    Debug.Log("Behaviour block: " + behaviourBlockSelectedSwordman.Count);
                     enemies[k].enemyBlockSet = behaviourBlockSelectedSwordman;
-                    Debug.Log("Enemy Block set: " + enemies[k].enemyBlockSet.Count);
                 }
 
                 enemies[k].gameObject.SetActive(true);
@@ -247,7 +243,7 @@ public class GameManager : MonoBehaviour
         var counter = 0;
         for (int i = 0; i < tileSetGenerator.tileSet.Count; i++)
         {
-            for (int j = 0; j < predefinedPathNeededTiles.Length; j++)
+            for (int j = 0; j < predefinedPathNeededTiles[tileSetChoosen].Length; j++)
             {
                 if (tileSetGenerator.tileSet[i].tile == predefinedPathNeededTiles[tileSetChoosen][j])
                 {
@@ -257,7 +253,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (counter == predefinedPathNeededTiles.Length)
+        if (counter == predefinedPathNeededTiles[tileSetChoosen].Length)
             predefinedPaths[tileSetChoosen].SetActive(true);
         else
             predefinedPaths[tileSetChoosen].SetActive(false);

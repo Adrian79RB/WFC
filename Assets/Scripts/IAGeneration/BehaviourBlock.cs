@@ -17,7 +17,8 @@ public abstract class BehaviourBlock
         children = new List<BehaviourBlock>();
         for (int i = 0; i < childrenVariables.Count; i++)
         {
-            children.Add(childrenVariables[i].blockChoosen);
+            if(childrenVariables[i] != null)
+                children.Add(childrenVariables[i].blockChoosen);
         }
     }
 
