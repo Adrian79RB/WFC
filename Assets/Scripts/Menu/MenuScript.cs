@@ -10,6 +10,11 @@ public class MenuScript : MonoBehaviour
         SceneManager.LoadScene("Scene1");
     }
 
+    public void TutorialButtonPressed()
+    {
+        SceneManager.LoadScene("Tutorial");
+    }
+
     public void ExitButtonPressed()
     {
         Application.Quit();

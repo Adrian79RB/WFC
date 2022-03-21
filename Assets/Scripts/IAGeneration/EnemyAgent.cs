@@ -52,6 +52,9 @@ public class EnemyAgent : MonoBehaviour
     public AudioClip bowCharge;
     public AudioClip[] stepsSoundEffect;
 
+    [Header("Tutorial Stuff")]
+    public GameObject endTutorialButton;
+
 
 
     // Game data container to use the BehviourBlocks
@@ -141,8 +144,11 @@ public class EnemyAgent : MonoBehaviour
         gameData = new Dictionary<string, float>();
         gameDataUpdateTime = gameDataUpdateTimer;
 
-        GetGameObjectGrid();
-        GetStrategicalPositions();
+        if (!GM.isInTutorial)
+        {
+            GetGameObjectGrid();
+            GetStrategicalPositions();
+        }
 
         stepSound.clip = stepsSoundEffect[GM.tileSetChoosen];
     }
@@ -680,7 +686,11 @@ public class EnemyAgent : MonoBehaviour
             damaged = true;
             health -= damage;
             if (health <= 0f)
+            {
                 StartCoroutine("DeathAnimation");
+                if (GM.isInTutorial)
+                    endTutorialButton.SetActive(true);
+            }
         }
         else if (isBlocking)
         {

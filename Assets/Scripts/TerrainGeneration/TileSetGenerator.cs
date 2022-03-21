@@ -14,9 +14,6 @@ public struct Tile
 
 public class TileSetGenerator : MonoBehaviour
 {
-    [Header("Game manager reference")]
-    public GameManager gm;
-
     [Header("Terrain building variables")]
     public int numCol;
     public int numRow;
@@ -153,7 +150,8 @@ public class TileSetGenerator : MonoBehaviour
                 TileElection(firstCell[0], firstCell[1]);
             }
 
-            surface.BuildNavMesh();
+            if(surface != null)
+                surface.BuildNavMesh();
         }
         else
         {
@@ -207,7 +205,7 @@ public class TileSetGenerator : MonoBehaviour
 
     private void InstantiateTile(int rowIndex, int colIndex, int chosenIndex)
     {
-        currentPos = new Vector3(colIndex * tileSize.x + tileSize.x / 2, tileSize.y / 2, rowIndex * tileSize.z + tileSize.z / 2);
+        currentPos = new Vector3(transform.position.x + colIndex * tileSize.x, transform.position.y, transform.position.z + rowIndex * tileSize.z);
         grid[rowIndex, colIndex].SetTile(tileSet[chosenIndex].tile, chosenIndex, currentPos, transform);
     }
 
@@ -398,20 +396,20 @@ public class TileSetGenerator : MonoBehaviour
     private void OnDrawGizmos()
     {
         // Draw Grid Edges
-        Gizmos.DrawLine(new Vector3(0, 0, 0), new Vector3(numCol, 0, 0));
-        Gizmos.DrawLine(new Vector3(0, 0, 0), new Vector3(0, 0, numRow));
-        Gizmos.DrawLine(new Vector3(0, 0, numRow), new Vector3(numCol, 0, numRow));
-        Gizmos.DrawLine(new Vector3(numCol, 0, 0), new Vector3(numCol, 0, numRow));
+        Gizmos.DrawLine(transform.position, new Vector3(numCol + transform.position.x, transform.position.y, transform.position.z));
+        Gizmos.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y, transform.position.z + numRow));
+        Gizmos.DrawLine(new Vector3(transform.position.x, transform.position.y, transform.position.z + numRow), new Vector3(transform.position.x + numCol, transform.position.y, transform.position.z + numRow));
+        Gizmos.DrawLine(new Vector3(transform.position.x + numCol, transform.position.y, transform.position.z), new Vector3(transform.position.x + numCol, transform.position.y, transform.position.z + numRow));
 
         // Draw Grid
         for (int i = 0; i < numCol; i++)
         {
-            Gizmos.DrawLine(new Vector3(i * tileSize.x, 0, 0), new Vector3(i * tileSize.x, 0, numRow));
+            Gizmos.DrawLine(new Vector3(transform.position.x + i * tileSize.x, transform.position.y, transform.position.z), new Vector3(transform.position.x + i * tileSize.x, transform.position.y, transform.position.z + numRow));
         }
 
         for (int i = 0; i < numRow; i++)
         {
-            Gizmos.DrawLine(new Vector3(0, 0, i * tileSize.x), new Vector3(numRow, 0, i * tileSize.x));
+            Gizmos.DrawLine(new Vector3(transform.position.x, transform.position.y, transform.position.z + i * tileSize.x), new Vector3(transform.position.x + numCol, transform.position.y, transform.position.z + i * tileSize.x));
         }
     }
 }

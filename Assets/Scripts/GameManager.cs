@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,6 +28,8 @@ public class GameManager : MonoBehaviour
     public int tileSetChoosen = 0; // 0 -> Normal; 1 -> Desert; 2 -> Snow; 3 -> Rare
     public GameObject[] buttons;
     public GameObject generateButton;
+    public int phase = 0;
+    public bool isInTutorial = false;
 
     GridTile[][] predefinedPathNeededTiles;
     List<Block> behaviourBlockSelectedArchers;
@@ -35,19 +38,28 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if(entranceCam.targetTexture != null)
+        if (SceneManager.GetActiveScene().name == "Tutorial")
         {
-            entranceCam.targetTexture.Release();
+            isInTutorial = true;
         }
 
-        entranceCam.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
-        cameraMat.mainTexture = entranceCam.targetTexture;
 
-        predefinedPathNeededTiles = new GridTile[4][];
-        predefinedPathNeededTiles[0] = grassPredefinnedTilesNeeded;
-        predefinedPathNeededTiles[1] = desertPredefinnedTilesNeeded;
-        predefinedPathNeededTiles[2] = snowPredefinnedTilesNeeded;
-        predefinedPathNeededTiles[3] = rarePredefinnedTilesNeeded;
+        if (!isInTutorial)
+        {
+            if (entranceCam.targetTexture != null)
+            {
+                entranceCam.targetTexture.Release();
+            }
+
+            entranceCam.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
+            cameraMat.mainTexture = entranceCam.targetTexture;
+
+            predefinedPathNeededTiles = new GridTile[4][];
+            predefinedPathNeededTiles[0] = grassPredefinnedTilesNeeded;
+            predefinedPathNeededTiles[1] = desertPredefinnedTilesNeeded;
+            predefinedPathNeededTiles[2] = snowPredefinnedTilesNeeded;
+            predefinedPathNeededTiles[3] = rarePredefinnedTilesNeeded;
+        }
 
         behaviourBlockSelectedArchers = new List<Block>();
         behaviourBlockSelectedSwordman = new List<Block>();
@@ -64,7 +76,8 @@ public class GameManager : MonoBehaviour
             tileSetGenerator.maxSteps = 9; // 9
 
         // Discover if the predefined path can be initialized
-        ActivatePredefinedPath();
+        if(!isInTutorial)
+            ActivatePredefinedPath();
 
         // Generate the tile map
         tileSetGenerator.Generate();
@@ -74,7 +87,8 @@ public class GameManager : MonoBehaviour
         //enemies[0].gameObject.SetActive(true);
 
         // Activate portal
-        arenaPortal.SetActive(true);
+        if(!isInTutorial)
+            arenaPortal.SetActive(true);
     }
 
     public void ClearTileSet()
@@ -97,7 +111,12 @@ public class GameManager : MonoBehaviour
         newTile.tile = tile;
         newTile.weight = weight;
         tileSetGenerator.tileSet.Add(newTile);
-        if (tileSetGenerator.tileSet.Count > 6 && behaviourBlockSelectedArchers.Count > 2 && behaviourBlockSelectedSwordman.Count > 2)
+        if (!isInTutorial && tileSetGenerator.tileSet.Count > 6 && behaviourBlockSelectedArchers.Count > 2 && behaviourBlockSelectedSwordman.Count > 2)
+        {
+            if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
+                generateButton.GetComponent<ButtonScript>().ActivateLight();
+        }
+        else if(isInTutorial && tileSetGenerator.tileSet.Count > 0 && (phase == 0 || behaviourBlockSelectedSwordman.Count > 0) )
         {
             if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().ActivateLight();
@@ -126,7 +145,12 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (tileSetGenerator.tileSet.Count > 6 && behaviourBlockSelectedArchers.Count > 2 && behaviourBlockSelectedSwordman.Count > 2)
+        if (!isInTutorial && tileSetGenerator.tileSet.Count > 6 && behaviourBlockSelectedArchers.Count > 2 && behaviourBlockSelectedSwordman.Count > 2)
+        {
+            if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
+                generateButton.GetComponent<ButtonScript>().ActivateLight();
+        }
+        else if(isInTutorial && tileSetGenerator.tileSet.Count > 0 && (phase == 0 || behaviourBlockSelectedSwordman.Count > 0 ) )
         {
             if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().ActivateLight();
@@ -140,7 +164,12 @@ public class GameManager : MonoBehaviour
         tileToRemove.weight = weight;
         tileSetGenerator.tileSet.Remove(tileToRemove);
 
-        if (tileSetGenerator.tileSet.Count <= 6 || behaviourBlockSelectedArchers.Count < 3 || behaviourBlockSelectedSwordman.Count < 3)
+        if (!isInTutorial && ( tileSetGenerator.tileSet.Count <= 6 || behaviourBlockSelectedArchers.Count < 3 || behaviourBlockSelectedSwordman.Count < 3 ) )
+        {
+            if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
+                generateButton.GetComponent<ButtonScript>().DiactivateLight();
+        }
+        else if (isInTutorial && ( tileSetGenerator.tileSet.Count < 1 || (behaviourBlockSelectedSwordman.Count < 1 && phase != 0) ) )
         {
             if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().DiactivateLight();
@@ -169,7 +198,12 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (tileSetGenerator.tileSet.Count < 6 || behaviourBlockSelectedArchers.Count < 3 || behaviourBlockSelectedSwordman.Count < 3)
+        if (!isInTutorial && (tileSetGenerator.tileSet.Count < 6 || behaviourBlockSelectedArchers.Count < 3 || behaviourBlockSelectedSwordman.Count < 3) )
+        {
+            if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
+                generateButton.GetComponent<ButtonScript>().DiactivateLight();
+        }
+        else if (isInTutorial && (tileSetGenerator.tileSet.Count < 1 || (behaviourBlockSelectedArchers.Count < 1 && phase != 0) ))
         {
             if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().DiactivateLight();
@@ -214,28 +248,43 @@ public class GameManager : MonoBehaviour
     {
         var enemyCount = 0;
         int k = 0;
-
-        while (enemyCount < 4 && k < enemies.Length)
+        
+        if (!isInTutorial)
         {
-            if (!enemies[k].gameObject.activeSelf && UnityEngine.Random.value > 0.7)
+            while (enemyCount < 4 && k < enemies.Length)
             {
-                enemyCount++;
-                if (enemies[k].type == EnemyType.Archer)
+                if (!enemies[k].gameObject.activeSelf && UnityEngine.Random.value > 0.7)
                 {
-                    enemies[k].enemyBlockSet = behaviourBlockSelectedArchers;
-                }
-                else
-                {
-                    enemies[k].enemyBlockSet = behaviourBlockSelectedSwordman;
+                    enemyCount++;
+                    if (enemies[k].type == EnemyType.Archer)
+                    {
+                        enemies[k].enemyBlockSet = behaviourBlockSelectedArchers;
+                    }
+                    else
+                    {
+                        enemies[k].enemyBlockSet = behaviourBlockSelectedSwordman;
+                    }
+
+                    enemies[k].gameObject.SetActive(true);
                 }
 
-                enemies[k].gameObject.SetActive(true);
+                k++;
+                if (k >= enemies.Length && enemyCount < 4)
+                    k = 0;
             }
-
-            k++;
-            if (k >= enemies.Length && enemyCount < 4)
-                k = 0;
         }
+        else
+        {
+            for (int i = 0; i < enemies.Length; i++)
+            {
+                if (!enemies[i].gameObject.activeSelf && enemies[i].type == EnemyType.Swordman)
+                {
+                    enemies[i].enemyBlockSet = behaviourBlockSelectedSwordman;
+                    enemies[i].gameObject.SetActive(true);
+                }
+            }
+        }
+       
     }
 
     private void ActivatePredefinedPath()

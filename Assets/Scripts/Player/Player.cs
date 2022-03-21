@@ -94,11 +94,11 @@ public class Player : MonoBehaviour
             movement = transform.right * x + transform.forward * z;
             controller.Move(movement * movementSpeed * Time.deltaTime);
 
-            if (z > -0.5f && z < 0.5 && x > -0.5 && x < 0.5 && stepSound.isPlaying)
+            if ( ((z > -0.5f && z < 0.5 && x > -0.5 && x < 0.5) || !isGrounded) && stepSound.isPlaying)
             {
                 stepSound.Stop();
             }
-            else if ( (z < -0.5f || z > 0.5 || x < -0.5 || x > 0.5) && !stepSound.isPlaying)
+            else if ( (z < -0.5f || z > 0.5 || x < -0.5 || x > 0.5) && !stepSound.isPlaying && isGrounded)
             {
                 stepSound.Play();
             }
@@ -108,6 +108,7 @@ public class Player : MonoBehaviour
             {
                 velocity.y = Mathf.Sqrt(jumpHigh * -2f * gravity);
                 effectSound.clip = jumpSound;
+                stepSound.Stop();
                 effectSound.Play();
             }
 
@@ -178,17 +179,27 @@ public class Player : MonoBehaviour
 
     public void PortalTeleport(Vector3 newPos)
     {
-        transform.position = newPos;
         stepSound.clip = stepSoundsClip[GM.tileSetChoosen];
+        EnterFightingPhase();
+        Respawn(newPos);
+    }
+
+    public void Respawn(Vector3 newPos)
+    {
+        transform.position = newPos;
+        StartCoroutine("ActivateCharacterController");
+    }
+
+    public void EnterFightingPhase()
+    {
         handGUI.SetActive(false);
         swordGUI.SetActive(true);
-        StartCoroutine("ActivateCharacterController");
+        isInGenerationRoom = false;
     }
 
     IEnumerator ActivateCharacterController()
     {
         GetComponent<CharacterController>().enabled = false;
-        isInGenerationRoom = false;
         yield return new WaitForSeconds(1.0f);
         GetComponent<CharacterController>().enabled = true;
     }

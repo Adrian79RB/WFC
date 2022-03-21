@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ButtonScript : MonoBehaviour
 {
@@ -53,6 +54,10 @@ public class ButtonScript : MonoBehaviour
                 {
                     GM.ClearTileSet();
                     currentlight.color = lightColors[0];
+                }
+                else if (transform.name.Contains("Tutorial") )
+                {
+                    SceneManager.LoadScene("Scene1");
                 }
                 else if (transform.name.Contains("Tile"))
                 {
