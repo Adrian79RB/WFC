@@ -197,6 +197,13 @@ public class Player : MonoBehaviour
         isInGenerationRoom = false;
     }
 
+    public void EnterInteractivPhase()
+    {
+        swordGUI.SetActive(false);
+        handGUI.SetActive(true);
+        isInGenerationRoom = true;
+    }
+
     IEnumerator ActivateCharacterController()
     {
         GetComponent<CharacterController>().enabled = false;

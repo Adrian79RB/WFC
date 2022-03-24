@@ -23,10 +23,15 @@ public class ChangeTileGen : MonoBehaviour
             if (GM.phase == 2)
                 player.EnterFightingPhase();
 
+            if (GM.phase == 3)
+                player.EnterInteractivPhase();
+
             if (textController.quoteIndex < 5)
                 textController.quoteIndex = 5;
 
-            textController.showNextQuote();
+            if(GM.phase < 3)
+                textController.showNextQuote();
+            
             Destroy(gameObject);
         }
     }
