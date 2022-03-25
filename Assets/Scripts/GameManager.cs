@@ -22,6 +22,10 @@ public class GameManager : MonoBehaviour
     public GridTile[] snowPredefinnedTilesNeeded;
     public GridTile[] rarePredefinnedTilesNeeded;
 
+    [Header("Music Audio Clips")]
+    public AudioClip tenseMusic;
+    public AudioClip epicMusic;
+
     [Header("Other Stuff")]
     public TileSetGenerator tileSetGenerator;
     public EnemyAgent[] enemies;
@@ -34,6 +38,7 @@ public class GameManager : MonoBehaviour
     GridTile[][] predefinedPathNeededTiles;
     List<Block> behaviourBlockSelectedArchers;
     List<Block> behaviourBlockSelectedSwordman;
+    AudioSource environmentalMusic;
 
     // Start is called before the first frame update
     void Start()
@@ -61,6 +66,7 @@ public class GameManager : MonoBehaviour
             predefinedPathNeededTiles[3] = rarePredefinnedTilesNeeded;
         }
 
+        environmentalMusic = GetComponent<AudioSource>();
         behaviourBlockSelectedArchers = new List<Block>();
         behaviourBlockSelectedSwordman = new List<Block>();
     }
@@ -79,6 +85,9 @@ public class GameManager : MonoBehaviour
         if(!isInTutorial)
             ActivatePredefinedPath();
 
+        environmentalMusic.clip = epicMusic;
+        environmentalMusic.Play();
+
         // Generate the tile map
         tileSetGenerator.Generate();
 
@@ -94,6 +103,9 @@ public class GameManager : MonoBehaviour
     public void ClearTileSet()
     {
         tileSetGenerator.ClearTiles();
+        
+        environmentalMusic.clip = tenseMusic;
+        environmentalMusic.Play();
 
         for (int i = 0; i < enemies.Length; i++)
         {
