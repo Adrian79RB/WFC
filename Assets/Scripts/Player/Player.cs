@@ -56,7 +56,8 @@ public class Player : MonoBehaviour
     Transform playerCamera;
 
     // Combat variables
-    bool isBlocking;
+    bool isBlocking = false;
+    bool isAttacking = false;
     float damageCoolDown = 2.0f;
     float damageTime = 0;
     bool damaged = false;
@@ -131,7 +132,7 @@ public class Player : MonoBehaviour
                         hit.transform.GetComponent<BehaviourButton>().ButtonPressed();
                 }
             }
-            else
+            else if(!isAttacking)
             {
                 StartCoroutine("SwordAttack");
                 if(!weaponGUIisChanging)
@@ -139,7 +140,7 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(1))
+        if (!isInGenerationRoom && Input.GetMouseButtonDown(1) && !isBlocking)
         {
             StartCoroutine("SwordBlock");
             if(!weaponGUIisChanging)
@@ -159,6 +160,7 @@ public class Player : MonoBehaviour
 
     IEnumerator SwordAttack()
     {
+        isAttacking = true;
         effectSound.clip = attackSound;
         effectSound.Play();
         sword.GetComponent<BoxCollider>().enabled = true;
@@ -166,6 +168,7 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(attackTime);
         anim.SetBool("IsAttacking", false);
         sword.GetComponent<BoxCollider>().enabled = false;
+        isAttacking = false;
     }
 
     IEnumerator SwordBlock()

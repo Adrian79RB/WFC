@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BehaviourButton : MonoBehaviour
 {
-    public Light currentLight;
+    public Light[] currentLight;
     public BlockType[] type;
     public int weight;
     public GameManager GM;
@@ -22,13 +22,19 @@ public class BehaviourButton : MonoBehaviour
         buttonSound.Play();
         if (buttonPressed)
         {
-            currentLight.enabled = false;
+            for (int i = 0; i < currentLight.Length; i++)
+            {
+                currentLight[i].enabled = false;
+            }
             if (transform.name.Contains("Block"))
                 GM.ClearBlock(type, weight);
         }
         else
         {
-            currentLight.enabled = true;
+            for (int i = 0; i < currentLight.Length; i++)
+            {
+                currentLight[i].enabled = true;
+            }
             if (transform.name.Contains("Block"))
                 GM.AddNewBlock(type, weight);
         }
