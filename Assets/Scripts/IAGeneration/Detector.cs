@@ -8,15 +8,26 @@ public class Detector : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Player")
+        OntriggerEnterAndStay(other);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        OntriggerEnterAndStay(other);
+    }
+
+    private void OntriggerEnterAndStay(Collider other)
+    {
+        if (other.tag == "Player")
         {
-            Vector3 dir = other.transform.position - shotPos.position;
-            dir.y += .5f;
+            Vector3 dir = new Vector3(other.transform.position.x - shotPos.position.x, 0f, transform.position.z - shotPos.position.z);
             dir = dir.normalized;
 
+            Vector3 originalPos = new Vector3(shotPos.position.x, .5f, shotPos.position.z);
+
             RaycastHit hit;
-            Debug.DrawRay(shotPos.position, dir * 3f, Color.red, 10f);
-            if (Physics.Raycast(shotPos.position, dir, out hit) && hit.transform.tag == "Player")
+            Debug.DrawRay(originalPos, dir * 3f, Color.red, 1f);
+            if (Physics.Raycast(originalPos, dir, out hit) && hit.transform.tag == "Player")
             {
                 GetComponentInParent<EnemyAgent>().PlayerDetected();
             }
