@@ -20,8 +20,8 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseBump:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: d72bc21e6de14d144abcd19e3488e248, type: 3}
+        m_Scale: {x: 0.4, y: 0.4}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
@@ -72,8 +72,8 @@ Material:
         m_Scale: {x: 3, y: 3}
         m_Offset: {x: 0, y: 0}
     - _Texture2Bump:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Texture: {fileID: 2800000, guid: f0dbbb60988aaa24fbe07c3c46d9db43, type: 3}
+        m_Scale: {x: 3, y: 3}
         m_Offset: {x: 0, y: 0}
     - _Texture3:
         m_Texture: {fileID: 2800000, guid: b4782b175066c6d43b0268997e7f5f0e, type: 3}
