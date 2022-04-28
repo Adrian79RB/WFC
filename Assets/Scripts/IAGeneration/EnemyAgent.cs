@@ -679,6 +679,7 @@ public class EnemyAgent : MonoBehaviour
 
     public void ReceiveDamage(float damage)
     {
+        GetComponent<Rigidbody>().isKinematic = false;
         if (!isBlocking && !damaged)
         {
             effectSound.clip = enemyHurt;

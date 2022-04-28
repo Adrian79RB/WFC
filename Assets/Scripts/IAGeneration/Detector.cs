@@ -23,10 +23,11 @@ public class Detector : MonoBehaviour
             Vector3 dir = new Vector3(other.transform.position.x - shotPos.position.x, 0f, transform.position.z - shotPos.position.z);
             dir = dir.normalized;
 
-            Vector3 originalPos = new Vector3(shotPos.position.x, .5f, shotPos.position.z);
+            Vector3 originalPos = new Vector3(shotPos.position.x, shotPos.position.y, shotPos.position.z);
 
+            Debug.DrawRay(shotPos.position, dir * 5f, Color.red, 10f);
             RaycastHit hit;
-            if (Physics.Raycast(originalPos, dir, out hit) && hit.transform.tag == "Player")
+            if (Physics.Raycast(shotPos.position, dir, out hit) && hit.transform.tag == "Player")
             {
                 GetComponentInParent<EnemyAgent>().PlayerDetected();
             }

@@ -11,6 +11,7 @@ public class Sword : MonoBehaviour
         Debug.Log("This sword: " + transform.name + "; object hit: "+ collision.transform.name);
         if (collision.transform.GetComponent<EnemyAgent>())
         {
+            collision.transform.GetComponent<Rigidbody>().isKinematic = true;
             collision.transform.GetComponent<EnemyAgent>().ReceiveDamage(damage);
         }
     }

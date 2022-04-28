@@ -332,7 +332,7 @@ public class GameManager : MonoBehaviour
     public void AddDeadEnemy()
     {
         enemiesDead += 1;
-        if (enemiesDead >= enemiesInGame)
+        if (!isInTutorial && enemiesDead >= enemiesInGame)
             EnemiesAreDead();
     }
 
