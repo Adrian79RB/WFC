@@ -77,10 +77,11 @@ public class EnemyAgent : MonoBehaviour
     Transform homeWaypoint;
     bool retreating = false;
     bool strategicallyHide = false;
-    float shootCoolDown = 8.0f;
+    float shootCoolDown = 5.0f;
     bool reloading = false;
     bool gettingAway = true;
     bool headingPlayer = false;
+    GameObject detector;
 
     // Variables that check the gameData Update
     float gameDataUpdateTimer = 2.0f;
@@ -89,7 +90,7 @@ public class EnemyAgent : MonoBehaviour
     // BehaviourGenerator and BehaviourTree
     BehaviourBlockGeneration treeGenerator;
     BehaviourBlock rootBlock;
-    BehaviourBlock currentBlock;
+    [SerializeField]BehaviourBlock currentBlock;
 
     // Tiles Grid to search the strategical positions
     Transform predefinedPath;
@@ -97,7 +98,7 @@ public class EnemyAgent : MonoBehaviour
 
     // Damage control variables
     bool damaged = false;
-    float damagedCoolDown = 2.0f;
+    float damagedCoolDown = 1.25f;
     float damagedTime = 0f;
 
     void Start()
@@ -131,6 +132,7 @@ public class EnemyAgent : MonoBehaviour
         allies = FindObjectsOfType<EnemyAgent>();
         homeWaypoint = GameObject.Find("homeWaypoint").transform;
         player = GameObject.Find("Player");
+        detector = transform.Find("Detector").gameObject;
 
         for(int i = 0; i < tileMap.childCount; i++)
         {
@@ -263,7 +265,13 @@ public class EnemyAgent : MonoBehaviour
             GetGameData();
         }
 
+        var aux = currentBlock;
         currentBlock = currentBlock.Run(this, gameData);
+
+        if(currentBlock != aux)
+        {
+            Debug.Log(transform.name + "run a new Behaviour Block: " + currentBlock);
+        }
 
         // Restarting some behaviour variables
         if (currentBlock.ToString() != "Retreat" && retreating)
@@ -297,62 +305,59 @@ public class EnemyAgent : MonoBehaviour
     /// </summary>
     public void GoPatrolling()
     {
-        if (!playerDetected)
+        if (currentWaypoint == null)
         {
-            if (currentWaypoint == null)
+            waypointIndex = 0;
+            currentWaypoint = waypoints[waypointIndex];
+            anim.SetBool("IsMoving", true);
+
+            if (!stepSound.isPlaying)
+                stepSound.Play();
+        }
+
+        agent.SetDestination(currentWaypoint.position);
+
+        // Moving among the patrol waypoints
+        if (!agent.isStopped && Vector3.Distance(currentWaypoint.position, transform.position) < agent.stoppingDistance)
+        {
+            if (UnityEngine.Random.value > 0.2f)
             {
-                waypointIndex = 0;
+                waypointIndex++;
+                if (waypointIndex >= waypoints.Length)
+                    waypointIndex = 0;
+
                 currentWaypoint = waypoints[waypointIndex];
                 anim.SetBool("IsMoving", true);
 
-                if(!stepSound.isPlaying)
+                if (!stepSound.isPlaying)
                     stepSound.Play();
             }
-
-            agent.SetDestination(currentWaypoint.position);
-
-            // Moving among the patrol waypoints
-            if (!agent.isStopped && Vector3.Distance(currentWaypoint.position, transform.position) < agent.stoppingDistance)
+            else
             {
-                if (UnityEngine.Random.value > 0.2f)
-                {
-                    waypointIndex++;
-                    if (waypointIndex >= waypoints.Length)
-                        waypointIndex = 0;
+                agent.isStopped = true;
+                anim.SetBool("IsMoving", false);
 
-                    currentWaypoint = waypoints[waypointIndex];
-                    anim.SetBool("IsMoving", true);
-
-                    if (!stepSound.isPlaying)
-                        stepSound.Play();
-                }
-                else
-                {
-                    agent.isStopped = true;
-                    anim.SetBool("IsMoving", false);
-
-                    if (stepSound.isPlaying)
-                        stepSound.Stop();
-                }
+                if (stepSound.isPlaying)
+                    stepSound.Stop();
             }
-            else if (agent.isStopped)// Waiting time until start patrolling again
+        }
+        else if (agent.isStopped)// Waiting time until start patrolling again
+        {
+            if (waitTimer == 5.0f)
             {
-                if(waitTimer == 5.0f)
-                {
-                    Vector3 pos = transform.position + transform.forward * 20;
-                    RotateEnemy(pos);
-                }
+                Vector3 pos = transform.position + transform.forward * 20;
+                RotateEnemy(pos);
+            }
 
-                waitTimer -= Time.deltaTime;
-                if (waitTimer <= 0f)
-                {
-                    waitTimer = 5.0f;
-                    agent.isStopped = false;
-                    anim.SetBool("IsMoving", true);
+            waitTimer -= Time.deltaTime;
+            if (waitTimer <= 0f)
+            {
+                waitTimer = 5.0f;
+                agent.isStopped = false;
+                anim.SetBool("IsMoving", true);
 
-                    if (!stepSound.isPlaying)
-                        stepSound.Play();
-                }
+                if (!stepSound.isPlaying)
+                    stepSound.Play();
             }
         }
     }
@@ -367,6 +372,9 @@ public class EnemyAgent : MonoBehaviour
         {
             if (agent.isStopped)
                 agent.isStopped = false;
+
+            if (type == EnemyType.Archer && anim.GetBool("IsAiming"))
+                anim.SetBool("IsAiming", false);
 
             currentWaypoint = homeWaypoint;
             anim.SetBool("IsMoving", true);
@@ -565,8 +573,11 @@ public class EnemyAgent : MonoBehaviour
             if (anim.GetBool("IsAiming"))
                 anim.SetBool("IsAiming", false);
 
+            if (agent.isStopped)
+                agent.isStopped = false;
+
             Vector3 direction = (player.transform.position - transform.position).normalized; // Get the opposite direction to the player
-            Vector3 targetPos = -direction * ShootDistance; // Calculate an appropriate position to shoot to the player
+            Vector3 targetPos = -direction * safeDistance; // Calculate an appropriate position to get distance from the player
 
             targetPos.x = Mathf.Clamp(targetPos.x, 1f, gameObjectGrid.GetLength(1) - 2);
             targetPos.z = Mathf.Clamp(targetPos.z, 1f, gameObjectGrid.GetLength(0) - 2);
@@ -615,11 +626,11 @@ public class EnemyAgent : MonoBehaviour
                 stepSound.Stop();
 
             var randomValue = UnityEngine.Random.value;
-            if ( randomValue > 0.7) // Attack the player
+            if ( randomValue > 0.8) // Attack the player
             {
                 StartCoroutine("attackAnimation");
             }
-            else if(randomValue < 0.3) // Block the player attack
+            else if(randomValue < 0.2) // Block the player attack
             {
                 StartCoroutine("blockAnimation");
             }
@@ -631,6 +642,8 @@ public class EnemyAgent : MonoBehaviour
     internal void Shoot()
     {
         // The enemy stops moving
+        if (!agent.isStopped)
+            agent.isStopped = true;
         if (anim.GetBool("IsMoving"))
             anim.SetBool("IsMoving", false);
         if (stepSound.isPlaying)
@@ -659,7 +672,7 @@ public class EnemyAgent : MonoBehaviour
             if (shootCoolDown < 0)
             {
                 reloading = false;
-                shootCoolDown = 8.0f;
+                shootCoolDown = 5.0f;
             }
         }
     }
@@ -690,6 +703,7 @@ public class EnemyAgent : MonoBehaviour
     internal void PlayerDetected()
     {
         playerDetected = true;
+        detector.SetActive(false);
 
         Collider[] allies = Physics.OverlapSphere(transform.position, 20f, LayerMask.GetMask("Enemy"));
         foreach (Collider ally in allies)
@@ -707,8 +721,10 @@ public class EnemyAgent : MonoBehaviour
         effectSound.Play();
 
         isAttacking = true;
-        sword.GetComponent<BoxCollider>().enabled = true;
         anim.SetBool("IsAttacking", true);
+
+        yield return new WaitForSeconds(.5f);
+        sword.GetComponent<BoxCollider>().enabled = true;
         yield return new WaitForSeconds(1.5f);
         anim.SetBool("IsAttacking", false);
         sword.GetComponent<BoxCollider>().enabled = false;
@@ -729,6 +745,8 @@ public class EnemyAgent : MonoBehaviour
         effectSound.clip = bowCharge;
         effectSound.Play();
 
+        Debug.Log("Shooting arrow");
+
         anim.SetBool("IsShooting", true);
         Rigidbody rgbdArrow = Instantiate(arrow, shootPos.position, shootPos.rotation, shootPos).GetComponent<Rigidbody>();
         rgbdArrow.AddForce(playerDirection * shootForce, ForceMode.Impulse);
@@ -741,14 +759,19 @@ public class EnemyAgent : MonoBehaviour
     IEnumerator DeathAnimation()
     {
         agent.isStopped = true;
+        RotateEnemy(transform.forward);
+        GetComponent<Rigidbody>().isKinematic = true;
+
         anim.SetBool("IsMoving", false);
         if (type == EnemyType.Archer)
         {
+            reloading = true;
             anim.SetBool("IsShooting", false);
             anim.SetBool("IsAiming", false);
         }
         else
         {
+            sword.GetComponent<BoxCollider>().enabled = false;
             anim.SetBool("IsBlocking", false);
             anim.SetBool("IsAttacking", false);
         }
@@ -759,6 +782,7 @@ public class EnemyAgent : MonoBehaviour
 
         yield return new WaitForSeconds(2.0f);
         gameObject.SetActive(false);
+        GM.AddDeadEnemy();
     }
 
     private void GetGameData()

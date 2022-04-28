@@ -39,6 +39,8 @@ public class GameManager : MonoBehaviour
     List<Block> behaviourBlockSelectedArchers;
     List<Block> behaviourBlockSelectedSwordman;
     AudioSource environmentalMusic;
+    int enemiesInGame = 0;
+    int enemiesDead = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -263,7 +265,7 @@ public class GameManager : MonoBehaviour
         
         if (!isInTutorial)
         {
-            while (enemyCount < 4 && k < enemies.Length)
+            while (enemyCount < 4 || k < enemies.Length)
             {
                 if (!enemies[k].gameObject.activeSelf && UnityEngine.Random.value > 0.7)
                 {
@@ -284,6 +286,8 @@ public class GameManager : MonoBehaviour
                 if (k >= enemies.Length && enemyCount < 4)
                     k = 0;
             }
+
+            enemiesInGame = enemyCount;
         }
         else
         {
@@ -323,5 +327,28 @@ public class GameManager : MonoBehaviour
 
         entrances[tileSetChoosen].SetActive(true);
         fortress[tileSetChoosen].SetActive(true);
+    }
+
+    public void AddDeadEnemy()
+    {
+        enemiesDead += 1;
+        if (enemiesDead >= enemiesInGame)
+            EnemiesAreDead();
+    }
+
+    private void EnemiesAreDead()
+    {
+        StartCoroutine(ChangeScene("WinScene"));
+    }
+
+    public void PlayerIsDead()
+    {
+        StartCoroutine(ChangeScene("Scene1"));
+    }
+
+    IEnumerator ChangeScene(string scene)
+    {
+        yield return new WaitForSeconds(2.0f);
+        SceneManager.LoadScene(scene);
     }
 }

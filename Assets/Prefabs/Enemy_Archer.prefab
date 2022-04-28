@@ -196,9 +196,9 @@ MonoBehaviour:
   GM: {fileID: 0}
   maxHealth: 10
   maxAmmo: 5
-  safeDistance: 6
+  safeDistance: 9
   AttackDistance: 4
-  ShootDistance: 8
+  ShootDistance: 4
   hitDistance: 1
   enemyBlockSet:
   - type: 0
@@ -237,6 +237,7 @@ MonoBehaviour:
   enemyBlock: {fileID: 8300000, guid: 0d628f53a0aebe0439ebaa7c749127b6, type: 3}
   bowCharge: {fileID: 8300000, guid: 7b13ea72e9667ae46be261652eede69d, type: 3}
   stepsSoundEffect: []
+  endTutorialButton: {fileID: 0}
   playerDetected: 0
 --- !u!82 &6225027367015794228
 AudioSource:

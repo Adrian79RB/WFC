@@ -79,6 +79,7 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        transform.GetChild(1).transform.localPosition = new Vector3(0f, 0f, 0f);
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         if (isGrounded && velocity.y < 0)
@@ -266,9 +267,9 @@ public class Player : MonoBehaviour
         if (!effectSound.isPlaying)
             effectSound.Play();
 
-        yield return new WaitForSeconds(2.0f);
+        yield return null;
 
-        SceneManager.LoadScene("Scene1");
+        GM.PlayerIsDead();
     }
 
     IEnumerator ChangeWeaponGUI(GameObject currentGUI, GameObject nextGUI)

@@ -799,6 +799,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4637273496912250}
   - component: {fileID: 95011576809172800}
+  - component: {fileID: 6907997317467277444}
   m_Layer: 0
   m_Name: Chr_Fantasy_Druid_01
   m_TagString: Untagged
@@ -900,6 +901,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &6907997317467277444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1203895893252470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd9d721ac8570e946b3f6a0d77e89386, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1213375453797652
 GameObject:
   m_ObjectHideFlags: 0

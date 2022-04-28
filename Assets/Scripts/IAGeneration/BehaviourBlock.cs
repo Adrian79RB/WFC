@@ -93,7 +93,7 @@ public class StrategicPositioning : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["playerDetected"] == 1f && (gameData["distanceToPlayer"] > gameData["safeDistance"] || gameData["playerVisible"] == 1.0f);
+        return gameData["playerDetected"] == 1f && (gameData["distanceToPlayer"] < gameData["safeDistance"] || gameData["playerVisible"] == 1.0f);
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)
@@ -139,7 +139,7 @@ public class GetAway : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
     {
-        return gameData["playerDetected"] == 1f && gameData["distanceToPlayer"] < gameData["AttackDistance"];
+        return gameData["playerDetected"] == 1f && gameData["distanceToPlayer"] < gameData["safeDistance"];
     }
 
     public override BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData)

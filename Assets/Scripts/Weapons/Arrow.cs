@@ -19,6 +19,7 @@ public class Arrow : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("Arrow collisioning with: " + collision.transform.name);
         if(collision.transform.tag == "Player")
         {
             collision.transform.GetComponent<Player>().ReceiveDamage(damage);

@@ -26,7 +26,6 @@ public class Detector : MonoBehaviour
             Vector3 originalPos = new Vector3(shotPos.position.x, .5f, shotPos.position.z);
 
             RaycastHit hit;
-            Debug.DrawRay(originalPos, dir * 3f, Color.red, 1f);
             if (Physics.Raycast(originalPos, dir, out hit) && hit.transform.tag == "Player")
             {
                 GetComponentInParent<EnemyAgent>().PlayerDetected();
