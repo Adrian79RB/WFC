@@ -215,10 +215,10 @@ public class Player : MonoBehaviour
         GetComponent<CharacterController>().enabled = true;
     }
 
-    public void ReceiveDamage(float damage)
+    public void ReceiveDamage(float damage, bool colliseumBottom)
     {
         Debug.Log("Recibe daño. Protegiendo: " + isBlocking);
-        if (!isBlocking && !damaged)
+        if (colliseumBottom || (!isBlocking && !damaged) )
         {
             effectSound.clip = hurtSound;
             effectSound.Play();

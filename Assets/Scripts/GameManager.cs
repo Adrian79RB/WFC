@@ -84,11 +84,12 @@ public class GameManager : MonoBehaviour
             tileSetGenerator.maxSteps = 9; // 9
 
         // Discover if the predefined path can be initialized
-        if(!isInTutorial)
+        if (!isInTutorial)
+        {
             ActivatePredefinedPath();
-
-        environmentalMusic.clip = epicMusic;
-        environmentalMusic.Play();
+            environmentalMusic.clip = epicMusic;
+            environmentalMusic.Play();
+        }
 
         // Generate the tile map
         tileSetGenerator.Generate();
@@ -115,8 +116,11 @@ public class GameManager : MonoBehaviour
             enemies[i].gameObject.SetActive(false);
         }
 
-        // Disactivate arena portal
-        arenaPortal.SetActive(false);
+        if (!isInTutorial)
+        {
+            // Disactivate arena portal
+            arenaPortal.SetActive(false);
+        }
     }
 
     public void AddNewTile(GridTile tile, int weight)
@@ -130,8 +134,12 @@ public class GameManager : MonoBehaviour
             if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().ActivateLight();
         }
-        else if(isInTutorial && tileSetGenerator.tileSet.Count > 0 && (phase == 0 || behaviourBlockSelectedSwordman.Count > 0) )
+        else if(isInTutorial && tileSetGenerator.tileSet.Count > 0 && phase == 0)
         {
+            if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
+                generateButton.GetComponent<ButtonScript>().ActivateLight();
+        }
+        else if(isInTutorial && tileSetGenerator.tileSet.Count > 5 && behaviourBlockSelectedSwordman.Count > 0){
             if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().ActivateLight();
         }
@@ -164,7 +172,12 @@ public class GameManager : MonoBehaviour
             if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().ActivateLight();
         }
-        else if(isInTutorial && tileSetGenerator.tileSet.Count > 0 && (phase == 0 || behaviourBlockSelectedSwordman.Count > 0 ) )
+        else if(isInTutorial && tileSetGenerator.tileSet.Count > 0 && phase == 0)
+        {
+            if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
+                generateButton.GetComponent<ButtonScript>().ActivateLight();
+        }
+        else if (isInTutorial && tileSetGenerator.tileSet.Count > 5 && behaviourBlockSelectedSwordman.Count > 0)
         {
             if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().ActivateLight();
@@ -183,8 +196,12 @@ public class GameManager : MonoBehaviour
             if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().DiactivateLight();
         }
-        else if (isInTutorial && ( tileSetGenerator.tileSet.Count < 1 || (behaviourBlockSelectedSwordman.Count < 1 && phase != 0) ) )
+        else if (isInTutorial && tileSetGenerator.tileSet.Count < 1 && phase == 0)
         {
+            if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
+                generateButton.GetComponent<ButtonScript>().DiactivateLight();
+        }
+        else if (isInTutorial && phase != 0 && (behaviourBlockSelectedSwordman.Count < 1 || tileSetGenerator.tileSet.Count < 6) ){ 
             if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().DiactivateLight();
         }
@@ -217,7 +234,7 @@ public class GameManager : MonoBehaviour
             if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().DiactivateLight();
         }
-        else if (isInTutorial && (tileSetGenerator.tileSet.Count < 1 || (behaviourBlockSelectedArchers.Count < 1 && phase != 0) ))
+        else if (isInTutorial && (tileSetGenerator.tileSet.Count < 1 || (behaviourBlockSelectedSwordman.Count < 1 && phase != 0) ))
         {
             if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
                 generateButton.GetComponent<ButtonScript>().DiactivateLight();

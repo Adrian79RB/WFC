@@ -22,7 +22,7 @@ public class Arrow : MonoBehaviour
         Debug.Log("Arrow collisioning with: " + collision.transform.name);
         if(collision.transform.tag == "Player")
         {
-            collision.transform.GetComponent<Player>().ReceiveDamage(damage);
+            collision.transform.GetComponent<Player>().ReceiveDamage(damage, false);
         }
         Destroy(gameObject);
     }

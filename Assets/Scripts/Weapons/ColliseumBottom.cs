@@ -11,7 +11,7 @@ public class ColliseumBottom : MonoBehaviour
     {
         if(other.GetComponent<Player>())
         {
-            other.GetComponent<Player>().ReceiveDamage(damage);
+            other.GetComponent<Player>().ReceiveDamage(damage, true);
         }
     }
 }
