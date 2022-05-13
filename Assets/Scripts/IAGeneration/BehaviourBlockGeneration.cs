@@ -18,7 +18,7 @@ public class BehaviourBlockGeneration
 {
     public int numCol = 4;
     public int numRow = 4;
-    public int maxSteps = 8;
+    public int maxSteps = 4;
     public const int connectionsNum = 4;
     public Block[] blockSet;
 
@@ -66,6 +66,7 @@ public class BehaviourBlockGeneration
             {
                 grid[i, j] = ScriptableObject.CreateInstance<IAVariable>();
                 grid[i, j].SetVariable(blockSet.Length);
+                grid[i, j].CalculateEntropy(blockSet);
             }
         }
 
@@ -131,15 +132,14 @@ public class BehaviourBlockGeneration
 
     private void GenerateBehaviourBlocksChildren(IAVariable currentVariable)
     {
-        if (currentVariable.blockChoosen == null)
-            return;
-
+        Debug.Log("Variable: " + currentVariable.blockChoosen + "; children: " + currentVariable.children.Count);
         currentVariable.blockChoosen.SetChildren(currentVariable.children);
 
         for (int i = 0; i < currentVariable.children.Count; i++)
         {
-            if (currentVariable.children[i] != null)
+            if (currentVariable.children[i].blockChoosen != null)
             {
+                Debug.Log("Variable: "+ currentVariable.blockChoosen + "; Hijo " + (i + 1) + ": " + currentVariable.children[i].blockChoosen);
                 GenerateBehaviourBlocksChildren(currentVariable.children[i]);
             }
         }
@@ -151,18 +151,22 @@ public class BehaviourBlockGeneration
         int nextCol = -1;
         int nextRow = -1;
 
+        Debug.Log("Valor entropia: ");
+
         for (int i = 0; i < grid.GetLength(0); i++)
         {
             for (int j = 0; j < grid.GetLength(1); j++)
             {
                 if (grid[i, j].blockChoosen == null && grid[i, j].domainCount == 1)
                 {
+                    Debug.Log("Bloque (" + i + ", " + j + "): dominioCount: " + grid[i, j].domainCount);
                     int[] nextGridCell = new int[2] { i, j };
                     return nextGridCell;
                 }
                 else if (grid[i, j].domainCount > 1)
                 {
                     var entropy = grid[i, j].entropy;
+                    Debug.Log("Bloque (" + i + ", " + j + "): " + entropy + "; dominio: " + grid[i, j].domain[0] + ", " + grid[i, j].domain[1] + ", " + grid[i, j].domain[2] + ", " + grid[i, j].domain[3]);
                     if (entropy < finalEntropy)
                     {
                         finalEntropy = entropy;
@@ -194,7 +198,7 @@ public class BehaviourBlockGeneration
             }
             else if(grid[rowIndex, colIndex].domainCount > 1)
             {
-                Block[] availableBlocks = new Block[grid[rowIndex, colIndex].domain.Length];
+                Block[] availableBlocks = new Block[grid[rowIndex, colIndex].domainCount];
                 int j = 0;
                 for (int i = 0; i < grid[rowIndex, colIndex].domain.Length; i++)
                 {
@@ -215,33 +219,42 @@ public class BehaviourBlockGeneration
         //Directions = 0 -> up; 1 -> right; 2 -> down> 3 -> left
         if (colIndex < (numCol - 1))
         {
-            ConstraintPropagation(rowIndex, colIndex + 1, 1, grid[rowIndex, colIndex], 0);
+            ConstraintPropagation(rowIndex, colIndex + 1, 1, grid[rowIndex, colIndex], 1);
 
-            if (grid[rowIndex, colIndex + 1].domainCount > 0
+            if (grid[rowIndex, colIndex + 1].domainCount > 0 
+                && grid[rowIndex, colIndex + 1].blockChoosen == null
                 && !grid[rowIndex, colIndex].children.Contains(grid[rowIndex, (colIndex + 1)]))
                 grid[rowIndex, colIndex].children.Add(grid[rowIndex, (colIndex + 1)]);
         }
         if (rowIndex < (numRow - 1))
         {
-            ConstraintPropagation(rowIndex + 1, colIndex, 2, grid[rowIndex, colIndex], 0);
+            ConstraintPropagation(rowIndex + 1, colIndex, 2, grid[rowIndex, colIndex], 1);
 
             if (grid[rowIndex + 1, colIndex].domainCount > 0
+                && grid[rowIndex + 1, colIndex].blockChoosen == null
                 && !grid[rowIndex, colIndex].children.Contains( grid[(rowIndex + 1), colIndex] ))
                 grid[rowIndex, colIndex].children.Add(grid[(rowIndex + 1), colIndex]);
         }
 
+        Debug.Log("Estoy en el bloque: " + rowIndex + ", " + colIndex);
+
         int[] nextGridCell = SearchNextGridCell();
+
+        Debug.Log("Voy a: " + nextGridCell[0] + ", " + nextGridCell[1]);
+
+        Debug.Log("Hijos de (" + rowIndex + ", " + colIndex + ") size: " + grid[rowIndex, colIndex].children.Count);
+
         if (nextGridCell[0] != -1 && nextGridCell[1] != -1)
             BlockElection(nextGridCell[0], nextGridCell[1]);
     }
 
     private void ConstraintPropagation(int rowIndex, int colIndex, int direction, IAVariable lastCell, int step)
     {
-        if (grid[rowIndex, colIndex].blockChoosen != null || grid[rowIndex, colIndex].domainCount < 1 || step >= maxSteps)
+        if (lastCell.domainCount < 1 || grid[rowIndex, colIndex].blockChoosen != null || grid[rowIndex, colIndex].domainCount < 1 || step >= maxSteps)
             return;
 
         step++;
-        if( lastCell.domainCount == 1 )// lastCell.blockChoosen != null)
+        if(lastCell.blockChoosen != null)  //lastCell.domainCount == 1)
         {
             for (int i = 0; i < grid[rowIndex, colIndex].domain.Length; i++)
             {
@@ -290,7 +303,7 @@ public class BehaviourBlockGeneration
             }
         }
 
-        if(grid[rowIndex, colIndex].domainCount == 1)
+        /*if(grid[rowIndex, colIndex].domainCount == 1)
         {
             int chosenIndex = -1;
             for (int i = 0; i < grid[rowIndex, colIndex].domain.Length; i++)
@@ -303,7 +316,7 @@ public class BehaviourBlockGeneration
             }
 
             grid[rowIndex, colIndex].SetBlock(blockSet[chosenIndex].block, chosenIndex);
-        }
+        }*/
 
         //Calculates the entropy of the block
         grid[rowIndex, colIndex].CalculateEntropy(blockSet);

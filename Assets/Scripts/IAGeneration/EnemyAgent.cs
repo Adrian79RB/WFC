@@ -159,21 +159,20 @@ public class EnemyAgent : MonoBehaviour
     private void DebugArbol()
     {
         Queue<BehaviourBlock> visited = new Queue<BehaviourBlock>();
-        visited.Enqueue(currentBlock);
+        BehaviourBlock auxBlock = currentBlock;
+        visited.Enqueue(auxBlock);
 
         while (visited.Count > 0)
         {
-            currentBlock = visited.Dequeue();
-            Debug.Log("Bloque actual: " + currentBlock + "; num hijos: " + currentBlock.children.Count);
+            auxBlock = visited.Dequeue();
+            Debug.Log("Bloque actual: " + auxBlock + "; num hijos: " + auxBlock.children.Count);
 
-            for (int i = 0; i < currentBlock.children.Count; i++)
+            for (int i = 0; i < auxBlock.children.Count; i++)
             {
-                Debug.Log("Child " + i + ": " + currentBlock.children[i]);
-                visited.Enqueue(currentBlock.children[i]);
+                Debug.Log("Child " + i + ": " + auxBlock.children[i]);
+                visited.Enqueue(auxBlock.children[i]);
             }
         }
-
-        currentBlock = rootBlock;
     }
 
     private void ClearBlockTree(BehaviourBlock block)

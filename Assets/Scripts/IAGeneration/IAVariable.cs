@@ -63,7 +63,7 @@ public class IAVariable : ScriptableObject
         {
             if (domain[i])
             {
-                auxiliar += (tileSet[i].weight/maxWeight) * Mathf.Log(tileSet[i].weight/maxWeight);
+                auxiliar += (tileSet[i].weight/maxWeight) * Mathf.Log((tileSet[i].weight/maxWeight));
             }
         }
 

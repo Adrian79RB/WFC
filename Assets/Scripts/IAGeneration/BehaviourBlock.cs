@@ -15,11 +15,16 @@ public abstract class BehaviourBlock
     public void SetChildren(List<IAVariable> childrenVariables)
     {
         children = new List<BehaviourBlock>();
+        Debug.Log("Block: " + this + "; children: " + + childrenVariables.Count);
         for (int i = 0; i < childrenVariables.Count; i++)
         {
-            if(childrenVariables[i].blockChoosen != null)
+            if (childrenVariables[i].blockChoosen != null)
+            {
                 children.Add(childrenVariables[i].blockChoosen);
+                Debug.Log("Block: " + this + "; Hijo " + (i+1) + ": " + childrenVariables[i].blockChoosen);
+            }
         }
+        Debug.Log("Block: " + this + "; children despues del for: " + children.Count);
     }
 
     public void SetConnections(int[] Connections)

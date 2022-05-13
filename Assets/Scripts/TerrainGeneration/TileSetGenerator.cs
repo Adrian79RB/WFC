@@ -47,6 +47,7 @@ public class TileSetGenerator : MonoBehaviour
             {
                 grid[i, j] = ScriptableObject.CreateInstance<Variable>();
                 grid[i, j].SetVariable(tileSet.Count);
+                grid[i, j].CalculateEntropy(tileSet);
             }
         }
 
