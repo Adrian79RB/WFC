@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour
             isInTutorial = true;
         }
 
+
         if (!isInTutorial)
         {
             if (entranceCam.targetTexture != null)

@@ -89,7 +89,7 @@ public class EnemyAgent : MonoBehaviour
 
     // BehaviourGenerator and BehaviourTree
     BehaviourBlockGeneration treeGenerator;
-    BehaviourBlock rootBlock;
+    BehaviourBlock  rootVariable;
     [SerializeField]BehaviourBlock currentBlock;
 
     // Tiles Grid to search the strategical positions
@@ -106,19 +106,19 @@ public class EnemyAgent : MonoBehaviour
         // Creating the Decision Tree
         treeGenerator = new BehaviourBlockGeneration();
         treeGenerator.blockSet = enemyBlockSet.ToArray();
-        if (rootBlock != null)
+        if (rootVariable != null)
         {
-            ClearBlockTree(rootBlock);
+            ClearBlockTree(rootVariable);
             treeGenerator.ClearTree();
         }
 
-        while (rootBlock == null)
+        while (rootVariable == null)
         {
-            rootBlock = treeGenerator.Generate();
-            if (rootBlock == null)
+            rootVariable = treeGenerator.Generate();
+            if (rootVariable == null)
                 treeGenerator.ClearTree();
         }
-        currentBlock = rootBlock;
+        currentBlock = rootVariable;
 
         DebugArbol(); // Method that shows the tree blocks
     }
@@ -174,6 +174,20 @@ public class EnemyAgent : MonoBehaviour
             }
         }
     }
+
+    /*private void DebugArbol(BehaviourBlock block)
+    {
+        Debug.Log("Bloque actual: " + block + "; num hijos: " + block.children.Count);
+
+        if (block.children.Count <= 0)
+            return;
+
+        for(int i = 0; i < block.children.Count; i++)
+            Debug.Log("Child: " + i + ": " + block.children[i]);
+
+        for (int i = 0; i < block.children.Count; i++)
+            DebugArbol(block.children[i]);
+    }*/
 
     private void ClearBlockTree(BehaviourBlock block)
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum BlockType { Retreat, StrategicPos, GetClose, GetAway, Attack, Shoot }
+public enum BlockType {Retreat, StrategicPos, GetClose, GetAway, Attack, Shoot, Patrol }
 
 [System.Serializable]
 public struct Block
@@ -70,8 +70,11 @@ public class BehaviourBlockGeneration
             }
         }
 
-        BehaviourBlock firstBlock = new Patrol();
-        firstBlock.SetConnections(new int[connectionsNum] { -1, -1, 0, 0 });
+        Block firstBlock = new Block();
+        firstBlock.type = BlockType.Patrol;
+        firstBlock.block = new Patrol();
+        firstBlock.block.SetConnections(new int[connectionsNum] { -1, -1, 0, 0 });
+
         grid[0, 0].SetBlock(firstBlock, -1);
         rootVariable = grid[0, 0];
     }
@@ -120,6 +123,7 @@ public class BehaviourBlockGeneration
 
             //Generate behaviour blocks children
             GenerateBehaviourBlocksChildren(rootVariable);
+            DebugArbol();
 
             return rootVariable.blockChoosen;
         }
@@ -130,19 +134,42 @@ public class BehaviourBlockGeneration
         }
     }
 
+    private void DebugArbol()
+    {
+        Queue<BehaviourBlock> visited = new Queue<BehaviourBlock>();
+        BehaviourBlock auxBlock = rootVariable.blockChoosen;
+        visited.Enqueue(auxBlock);
+
+        while (visited.Count > 0)
+        {
+            auxBlock = visited.Dequeue();
+            Debug.Log("Bloque actual: " + auxBlock + "; num hijos: " + auxBlock.children.Count);
+
+            for (int i = 0; i < auxBlock.children.Count; i++)
+            {
+                Debug.Log("Child " + i + ": " + auxBlock.children[i]);
+                visited.Enqueue(auxBlock.children[i]);
+            }
+        }
+    }
+
     private void GenerateBehaviourBlocksChildren(IAVariable currentVariable)
     {
-        Debug.Log("Variable: " + currentVariable.blockChoosen + "; children: " + currentVariable.children.Count);
+        Debug.Log("(Antes) Variable: " + currentVariable.blockChoosen + "; Variable children: " + currentVariable.children.Count);
         currentVariable.blockChoosen.SetChildren(currentVariable.children);
+        Debug.Log("(Despues) Variable: " + currentVariable.blockChoosen + "; Variable children: " + currentVariable.children.Count + "; block children: " + currentVariable.blockChoosen.children.Count);
 
         for (int i = 0; i < currentVariable.children.Count; i++)
         {
             if (currentVariable.children[i].blockChoosen != null)
             {
                 Debug.Log("Variable: "+ currentVariable.blockChoosen + "; Hijo " + (i + 1) + ": " + currentVariable.children[i].blockChoosen);
-                GenerateBehaviourBlocksChildren(currentVariable.children[i]);
+                IAVariable nextChild = currentVariable.children[i];
+                GenerateBehaviourBlocksChildren(nextChild);
             }
         }
+
+        Debug.Log("Antes de salir del Generate de " + currentVariable.blockChoosen + " tengo " + currentVariable.blockChoosen.children.Count + " hijos");
     }
 
     public int[] SearchNextGridCell()
@@ -212,7 +239,7 @@ public class BehaviourBlockGeneration
                 chosenIndex = weightedRandom(availableBlocks);
             }
 
-            grid[rowIndex, colIndex].SetBlock(blockSet[chosenIndex].block,  chosenIndex);
+            grid[rowIndex, colIndex].SetBlock(blockSet[chosenIndex],  chosenIndex);
         }
 
         //Propagate Constraints
