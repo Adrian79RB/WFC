@@ -123,7 +123,6 @@ public class BehaviourBlockGeneration
 
             //Generate behaviour blocks children
             GenerateBehaviourBlocksChildren(rootVariable);
-            DebugArbol();
 
             return rootVariable.blockChoosen;
         }
@@ -134,42 +133,19 @@ public class BehaviourBlockGeneration
         }
     }
 
-    private void DebugArbol()
-    {
-        Queue<BehaviourBlock> visited = new Queue<BehaviourBlock>();
-        BehaviourBlock auxBlock = rootVariable.blockChoosen;
-        visited.Enqueue(auxBlock);
-
-        while (visited.Count > 0)
-        {
-            auxBlock = visited.Dequeue();
-            Debug.Log("Bloque actual: " + auxBlock + "; num hijos: " + auxBlock.children.Count);
-
-            for (int i = 0; i < auxBlock.children.Count; i++)
-            {
-                Debug.Log("Child " + i + ": " + auxBlock.children[i]);
-                visited.Enqueue(auxBlock.children[i]);
-            }
-        }
-    }
-
     private void GenerateBehaviourBlocksChildren(IAVariable currentVariable)
     {
-        Debug.Log("(Antes) Variable: " + currentVariable.blockChoosen + "; Variable children: " + currentVariable.children.Count);
         currentVariable.blockChoosen.SetChildren(currentVariable.children);
-        Debug.Log("(Despues) Variable: " + currentVariable.blockChoosen + "; Variable children: " + currentVariable.children.Count + "; block children: " + currentVariable.blockChoosen.children.Count);
 
         for (int i = 0; i < currentVariable.children.Count; i++)
         {
             if (currentVariable.children[i].blockChoosen != null)
             {
-                Debug.Log("Variable: "+ currentVariable.blockChoosen + "; Hijo " + (i + 1) + ": " + currentVariable.children[i].blockChoosen);
                 IAVariable nextChild = currentVariable.children[i];
                 GenerateBehaviourBlocksChildren(nextChild);
             }
         }
 
-        Debug.Log("Antes de salir del Generate de " + currentVariable.blockChoosen + " tengo " + currentVariable.blockChoosen.children.Count + " hijos");
     }
 
     public int[] SearchNextGridCell()
@@ -178,22 +154,18 @@ public class BehaviourBlockGeneration
         int nextCol = -1;
         int nextRow = -1;
 
-        Debug.Log("Valor entropia: ");
-
         for (int i = 0; i < grid.GetLength(0); i++)
         {
             for (int j = 0; j < grid.GetLength(1); j++)
             {
                 if (grid[i, j].blockChoosen == null && grid[i, j].domainCount == 1)
                 {
-                    Debug.Log("Bloque (" + i + ", " + j + "): dominioCount: " + grid[i, j].domainCount);
                     int[] nextGridCell = new int[2] { i, j };
                     return nextGridCell;
                 }
                 else if (grid[i, j].domainCount > 1)
                 {
                     var entropy = grid[i, j].entropy;
-                    Debug.Log("Bloque (" + i + ", " + j + "): " + entropy + "; dominio: " + grid[i, j].domain[0] + ", " + grid[i, j].domain[1] + ", " + grid[i, j].domain[2] + ", " + grid[i, j].domain[3]);
                     if (entropy < finalEntropy)
                     {
                         finalEntropy = entropy;
@@ -263,14 +235,8 @@ public class BehaviourBlockGeneration
                 grid[rowIndex, colIndex].children.Add(grid[(rowIndex + 1), colIndex]);
         }
 
-        Debug.Log("Estoy en el bloque: " + rowIndex + ", " + colIndex);
 
         int[] nextGridCell = SearchNextGridCell();
-
-        Debug.Log("Voy a: " + nextGridCell[0] + ", " + nextGridCell[1]);
-
-        Debug.Log("Hijos de (" + rowIndex + ", " + colIndex + ") size: " + grid[rowIndex, colIndex].children.Count);
-
         if (nextGridCell[0] != -1 && nextGridCell[1] != -1)
             BlockElection(nextGridCell[0], nextGridCell[1]);
     }
@@ -281,7 +247,7 @@ public class BehaviourBlockGeneration
             return;
 
         step++;
-        if(lastCell.blockChoosen != null)  //lastCell.domainCount == 1)
+        if(lastCell.blockChoosen != null)
         {
             for (int i = 0; i < grid[rowIndex, colIndex].domain.Length; i++)
             {
@@ -329,21 +295,6 @@ public class BehaviourBlockGeneration
                 }
             }
         }
-
-        /*if(grid[rowIndex, colIndex].domainCount == 1)
-        {
-            int chosenIndex = -1;
-            for (int i = 0; i < grid[rowIndex, colIndex].domain.Length; i++)
-            {
-                if (grid[rowIndex, colIndex].domain[i])
-                {
-                    chosenIndex = i;
-                    break;
-                }
-            }
-
-            grid[rowIndex, colIndex].SetBlock(blockSet[chosenIndex].block, chosenIndex);
-        }*/
 
         //Calculates the entropy of the block
         grid[rowIndex, colIndex].CalculateEntropy(blockSet);

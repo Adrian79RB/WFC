@@ -38,6 +38,11 @@ public class ButtonScript : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        buttonPressed = false;
+    }
+
     public void ButtonPressed()
     {
         if (transform.name.Contains("Set"))

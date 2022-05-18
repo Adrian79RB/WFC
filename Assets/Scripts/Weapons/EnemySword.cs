@@ -11,7 +11,7 @@ public class EnemySword : MonoBehaviour
         Debug.Log("This sword: " + transform.name + "; object hit: " + other.transform.name);
         if (other.transform.GetComponent<Player>())
         {
-            other.transform.GetComponent<Player>().ReceiveDamage(damage, true);
+            other.transform.GetComponent<Player>().ReceiveDamage(damage, false);
         }
     }
 }

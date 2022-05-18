@@ -1862,7 +1862,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 139344957}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1fbe482946cc4b145a54ad8432a1889d, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
@@ -10357,7 +10357,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 581682445}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 1fbe482946cc4b145a54ad8432a1889d, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
@@ -15563,7 +15563,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 20f102bd5c64d56499ff13f1919e5e5e, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.6
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -18317,7 +18317,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1015942412}
   m_LocalRotation: {x: -0.18540931, y: -0, z: -0, w: 0.9826614}
-  m_LocalPosition: {x: -0.53500175, y: 3.1081963, z: -6.477972}
+  m_LocalPosition: {x: -0.53500175, y: 0.93, z: -12.03}
   m_LocalScale: {x: 50, y: 20, z: 5}
   m_Children: []
   m_Father: {fileID: 694058464}
@@ -24170,7 +24170,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh269346
+  m_Name: pb_Mesh49176
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -25774,7 +25774,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh269760
+  m_Name: pb_Mesh49590
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -28974,7 +28974,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1787798885}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.9, y: 2.231, z: -18.86}
+  m_LocalPosition: {x: 12.848, y: 2.231, z: -18.86}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 139344963}
@@ -32965,8 +32965,8 @@ CharacterController:
   serializedVersion: 2
   m_Height: 1.25
   m_Radius: 0.6
-  m_SlopeLimit: 15
-  m_StepOffset: 0.5
+  m_SlopeLimit: 10
+  m_StepOffset: 0.1
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.8, z: 0}

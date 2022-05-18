@@ -175,20 +175,6 @@ public class EnemyAgent : MonoBehaviour
         }
     }
 
-    /*private void DebugArbol(BehaviourBlock block)
-    {
-        Debug.Log("Bloque actual: " + block + "; num hijos: " + block.children.Count);
-
-        if (block.children.Count <= 0)
-            return;
-
-        for(int i = 0; i < block.children.Count; i++)
-            Debug.Log("Child: " + i + ": " + block.children[i]);
-
-        for (int i = 0; i < block.children.Count; i++)
-            DebugArbol(block.children[i]);
-    }*/
-
     private void ClearBlockTree(BehaviourBlock block)
     {
         for (int i = 0; i < block.children.Count; i++)
@@ -675,7 +661,7 @@ public class EnemyAgent : MonoBehaviour
 
         // Check if there is enought ammo to shoot and the player is visible to shoot them
         RaycastHit hit;
-        if (!reloading && ammo > 0 && Physics.Raycast(shootPos.position, playerDirection, out hit, ShootDistance) && hit.transform.tag == "Player")
+        if (health > 0 && !reloading && ammo > 0 && Physics.Raycast(shootPos.position, playerDirection, out hit, ShootDistance) && hit.transform.tag == "Player")
         {
             StartCoroutine(shootAnimation(playerDirection));
         }
@@ -758,6 +744,7 @@ public class EnemyAgent : MonoBehaviour
     {
         effectSound.clip = bowCharge;
         effectSound.Play();
+        isAttacking = true;
 
         Debug.Log("Shooting arrow");
 
@@ -768,6 +755,7 @@ public class EnemyAgent : MonoBehaviour
         ammo--;
         yield return new WaitForSeconds(.5f);
         anim.SetBool("IsShooting", false);
+        isAttacking = false;
     }
 
     IEnumerator DeathAnimation()
@@ -775,6 +763,8 @@ public class EnemyAgent : MonoBehaviour
         agent.isStopped = true;
         RotateEnemy(transform.forward);
         GetComponent<Rigidbody>().isKinematic = true;
+        if(isAttacking)
+            StopCoroutine("shootAnimation");
 
         anim.SetBool("IsMoving", false);
         if (type == EnemyType.Archer)

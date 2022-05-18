@@ -79,9 +79,9 @@ public class GameManager : MonoBehaviour
         if (tileSetGenerator.tileSet.Count <= 4)
             tileSetGenerator.maxSteps = 15;
         else if(tileSetGenerator.tileSet.Count <= 9)
-            tileSetGenerator.maxSteps = 10; // 12
+            tileSetGenerator.maxSteps = 13;
         else if(tileSetGenerator.tileSet.Count <= 13)
-            tileSetGenerator.maxSteps = 9; // 9
+            tileSetGenerator.maxSteps = 9;
 
         // Discover if the predefined path can be initialized
         if (!isInTutorial)
