@@ -133,7 +133,7 @@ public class Player : MonoBehaviour
                         hit.transform.GetComponent<BehaviourButton>().ButtonPressed();
                 }
             }
-            else if(!isAttacking)
+            else if(!isAttacking && !isBlocking)
             {
                 StartCoroutine("SwordAttack");
                 if(!weaponGUIisChanging)
@@ -141,7 +141,7 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (!isInGenerationRoom && Input.GetMouseButtonDown(1) && !isBlocking)
+        if (!isInGenerationRoom && Input.GetMouseButtonDown(1) && !isBlocking && !isAttacking)
         {
             StartCoroutine("SwordBlock");
             if(!weaponGUIisChanging)

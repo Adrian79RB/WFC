@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class PortalTeleporter : MonoBehaviour
 {
+    public GameManager GM;
+
     public Transform player;
     public Transform receiver;
 
     public AudioSource portalEnabledSound;
     public AudioSource portalCrossedSound;
+
+    public bool finalPortal;
 
     bool playerIsOverlapping = false;
 
@@ -31,6 +35,11 @@ public class PortalTeleporter : MonoBehaviour
 
                 Vector3 positionOffset = Quaternion.Euler(0f, rotDifference, 0f) * portalToPlayer;
                 player.GetComponent<Player>().PortalTeleport(receiver.position + positionOffset);
+
+                if (finalPortal)
+                {
+                    GM.CrossingEndPortal();
+                }
 
                 playerIsOverlapping = false;
             }

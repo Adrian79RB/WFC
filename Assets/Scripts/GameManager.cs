@@ -8,8 +8,12 @@ public class GameManager : MonoBehaviour
 {
     [Header("Portal Stuff")]
     public Camera entranceCam;
+    public Camera exitCam;
     public Material cameraMat;
+    public Material cameraMat2;
     public GameObject arenaPortal;
+    public GameObject initRoomPortal;
+    
 
     [Header("Map types Stuff")]
     public GameObject[] predefinedPaths;
@@ -57,9 +61,15 @@ public class GameManager : MonoBehaviour
             {
                 entranceCam.targetTexture.Release();
             }
+            if (exitCam.targetTexture != null)
+            {
+                exitCam.targetTexture.Release();
+            }
 
             entranceCam.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
+            exitCam.targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
             cameraMat.mainTexture = entranceCam.targetTexture;
+            cameraMat2.mainTexture = exitCam.targetTexture;
 
             predefinedPathNeededTiles = new GridTile[4][];
             predefinedPathNeededTiles[0] = grassPredefinnedTilesNeeded;
@@ -350,10 +360,10 @@ public class GameManager : MonoBehaviour
     {
         enemiesDead += 1;
         if (!isInTutorial && enemiesDead >= enemiesInGame)
-            EnemiesAreDead();
+            initRoomPortal.SetActive(true);
     }
 
-    private void EnemiesAreDead()
+    public void CrossingEndPortal()
     {
         StartCoroutine(ChangeScene("WinScene"));
     }
