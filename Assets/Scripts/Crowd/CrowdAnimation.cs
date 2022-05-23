@@ -35,6 +35,7 @@ public class CrowdAnimation : MonoBehaviour
 
         if (!isStarted)
         {
+            // Execute randomly one of the three possible animations for the crowd
             isStarted = true;
             var value = Random.value;
             if (value < 0.25)
@@ -58,6 +59,7 @@ public class CrowdAnimation : MonoBehaviour
         }
         else
         {
+            // Waiting time between animations
             waitTime += Time.deltaTime;
             if(waitTime > waitTimer)
             {

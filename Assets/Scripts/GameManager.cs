@@ -83,6 +83,9 @@ public class GameManager : MonoBehaviour
         behaviourBlockSelectedSwordman = new List<Block>();
     }
 
+    /// <summary>
+    /// Method called by the generate button from the initial room
+    /// </summary>
     public void GenerateTileSet()
     {
         // Set the max steps number of the algorith
@@ -106,20 +109,24 @@ public class GameManager : MonoBehaviour
 
         // Activate the Enemies
         ActivateEnemies();
-        //enemies[0].gameObject.SetActive(true);
 
         // Activate portal
         if(!isInTutorial)
             arenaPortal.SetActive(true);
     }
 
+    /// <summary>
+    /// This method eliminates the tile map created by the generate method, it is called from the generate button in the initial room
+    /// </summary>
     public void ClearTileSet()
     {
+        // Eliminate tiles from tileMap
         tileSetGenerator.ClearTiles();
         
         environmentalMusic.clip = tenseMusic;
         environmentalMusic.Play();
 
+        // Deactivate the enemies
         for (int i = 0; i < enemies.Length; i++)
         {
             enemies[i].strategicalPosition.Clear();
@@ -133,12 +140,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Add a new tile to the Tile set that is going to be used to generate the Tile map
+    /// </summary>
+    /// <param name="tile">Tile selected to be intoruced in the TileSet</param>
+    /// <param name="weight">Weigth related to the tile selected</param>
     public void AddNewTile(GridTile tile, int weight)
     {
+        // Creating the object that represents the tile
         Tile newTile = new Tile();
         newTile.tile = tile;
         newTile.weight = weight;
         tileSetGenerator.tileSet.Add(newTile);
+
+        // Changing the state of the generate button
         if (!isInTutorial && tileSetGenerator.tileSet.Count > 6 && behaviourBlockSelectedArchers.Count > 2 && behaviourBlockSelectedSwordman.Count > 2)
         {
             if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
@@ -155,17 +170,24 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Add a new block to the Block set that is going to be used to generate the decision tree for the NPCs
+    /// </summary>
+    /// <param name="type">Block selected to be introduce in the BlockSet</param>
+    /// <param name="weight">Weight related to the selected block</param>
     public void AddNewBlock(BlockType[] type, int weight)
     {
+        // Create the object that represent the block selected
         Block newBlock = new Block();
         newBlock.weight = weight;
-        if (type.Length == 1)
+
+        if (type.Length == 1) // The block is appropriate for both enemy type
         {
             newBlock.type = type[0];
             behaviourBlockSelectedArchers.Add(newBlock);
             behaviourBlockSelectedSwordman.Add(newBlock);
         }
-        else
+        else // Each enemy type has a different block but represented by the same button in the initial room
         {
             for (int i = 0; i < type.Length; i++)
             {
@@ -177,6 +199,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        // Changing the state of the generate button
         if (!isInTutorial && tileSetGenerator.tileSet.Count > 6 && behaviourBlockSelectedArchers.Count > 2 && behaviourBlockSelectedSwordman.Count > 2)
         {
             if (!generateButton.GetComponent<ButtonScript>().currentlight.enabled)
@@ -194,13 +217,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Remove a tile from the Tile set that has been selected
+    /// </summary>
+    /// <param name="tile">Tile selected to be removed from the tile set</param>
+    /// <param name="weight">Weight related to the selected tile</param>
     public void ClearTile(GridTile tile, int weight)
     {
+        // Object created to represent the selected tile
         Tile tileToRemove = new Tile();
         tileToRemove.tile = tile;
         tileToRemove.weight = weight;
         tileSetGenerator.tileSet.Remove(tileToRemove);
 
+        // Changing the state of the generate button from the initial room
         if (!isInTutorial && ( tileSetGenerator.tileSet.Count <= 6 || behaviourBlockSelectedArchers.Count < 3 || behaviourBlockSelectedSwordman.Count < 3 ) )
         {
             if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
@@ -217,17 +247,24 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Remove a block from the Block set that has been selected
+    /// </summary>
+    /// <param name="type">Block selected to be removed from the block set</param>
+    /// <param name="weight">Weight related to the block selected</param>
     public void ClearBlock(BlockType[] type, int weight)
     {
+        // Creating the object that represents the block selected
         Block blockToRemove = new Block();
         blockToRemove.weight = weight;
-        if(type.Length == 1)
+
+        if(type.Length == 1) // The block is appropriate for both enemy types
         {
             blockToRemove.type = type[0];
             behaviourBlockSelectedArchers.Remove(blockToRemove);
             behaviourBlockSelectedSwordman.Remove(blockToRemove);
         }
-        else
+        else // Each enemy type has a different block 
         {
             for (int i = 0; i < type.Length; i++)
             {
@@ -239,6 +276,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        // Changing the state of the generate button from the initial room
         if (!isInTutorial && (tileSetGenerator.tileSet.Count < 6 || behaviourBlockSelectedArchers.Count < 3 || behaviourBlockSelectedSwordman.Count < 3) )
         {
             if (generateButton.GetComponent<ButtonScript>().currentlight.enabled)
@@ -251,6 +289,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Change the type of the tiles that could generate the tile map (Four types: Grass, Sand, Snow, Rare)
+    /// </summary>
     public void ChangeTileSet()
     {
         DeactivateAllButtons();
@@ -260,6 +301,9 @@ public class GameManager : MonoBehaviour
             tileSetChoosen = 0;
     }
 
+    /// <summary>
+    /// Deselect all the buttons that determine the tile set and block set from the initial room
+    /// </summary>
     private void DeactivateAllButtons()
     {
         for (int i = 0; i < buttons.Length; i++)
@@ -272,6 +316,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Change the object that represent the tile type in the buttons from the initial room
+    /// </summary>
     private void ChangeRotableTiles()
     {
         for (int i = 0; i < buttons.Length; i++)
@@ -285,6 +332,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Enable the enemies and establish the blocks that are going to be used to generate each decision tree
+    /// </summary>
     private void ActivateEnemies()
     {
         var enemyCount = 0;
@@ -292,11 +342,13 @@ public class GameManager : MonoBehaviour
         
         if (!isInTutorial)
         {
+            // Activate the enemies randomly
             while (enemyCount < 4 || k < enemies.Length)
             {
                 if (!enemies[k].gameObject.activeSelf && UnityEngine.Random.value > 0.7)
                 {
                     enemyCount++;
+                    // Establish the block set needed by each enemy based on its type
                     if (enemies[k].type == EnemyType.Archer)
                     {
                         enemies[k].enemyBlockSet = behaviourBlockSelectedArchers;
@@ -318,6 +370,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            // In the tutorial there is only a unique enemy and it has to be activated always
             for (int i = 0; i < enemies.Length; i++)
             {
                 if (!enemies[i].gameObject.activeSelf && enemies[i].type == EnemyType.Swordman)
@@ -330,8 +383,12 @@ public class GameManager : MonoBehaviour
        
     }
 
+    /// <summary>
+    /// Select which is the predefined path that has to be activated based on the tile type selected
+    /// </summary>
     private void ActivatePredefinedPath()
     {
+        // Determining if all the needed tiles to generate the predefined path have beem selected
         var counter = 0;
         for (int i = 0; i < tileSetGenerator.tileSet.Count; i++)
         {
@@ -345,6 +402,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        // If all the needed tiles have been selected, activate the predefined path
         if (counter == predefinedPathNeededTiles[tileSetChoosen].Length)
             predefinedPaths[tileSetChoosen].SetActive(true);
         else
@@ -352,27 +410,42 @@ public class GameManager : MonoBehaviour
 
         tileSetGenerator.predefinedPath = predefinedPaths[tileSetChoosen].transform;
 
+        // Activate the appropriate entrance and frotificate position in the arena
         entrances[tileSetChoosen].SetActive(true);
         fortress[tileSetChoosen].SetActive(true);
     }
 
+    /// <summary>
+    /// Add an enemy to the dead list
+    /// </summary>
     public void AddDeadEnemy()
     {
         enemiesDead += 1;
-        if (!isInTutorial && enemiesDead >= enemiesInGame)
+        if (!isInTutorial && enemiesDead >= enemiesInGame) // If all the enemies are dead, activate the end game portal
             initRoomPortal.SetActive(true);
     }
 
+    /// <summary>
+    /// Player cross through the end game portal
+    /// </summary>
     public void CrossingEndPortal()
     {
         StartCoroutine(ChangeScene("WinScene"));
     }
 
+    /// <summary>
+    /// Restart the game scene
+    /// </summary>
     public void PlayerIsDead()
     {
         StartCoroutine(ChangeScene("Scene1"));
     }
 
+    /// <summary>
+    /// Change to the next scene in the game flow
+    /// </summary>
+    /// <param name="scene">Next scene reference</param>
+    /// <returns></returns>
     IEnumerator ChangeScene(string scene)
     {
         yield return new WaitForSeconds(2.0f);

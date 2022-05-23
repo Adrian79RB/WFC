@@ -25,6 +25,10 @@ public class CrowdScript : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Determine the sound that the crowd is emitting
+    /// </summary>
+    /// <returns></returns>
     IEnumerator CrowdCelebration()
     {
         CheeringHasSound = true;

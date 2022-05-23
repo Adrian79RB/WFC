@@ -120,7 +120,7 @@ public class EnemyAgent : MonoBehaviour
         }
         currentBlock = rootVariable;
 
-        DebugArbol(); // Method that shows the tree blocks
+        //DebugArbol(); // Method that shows the tree blocks
     }
 
     private void OnEnable()
@@ -156,6 +156,9 @@ public class EnemyAgent : MonoBehaviour
         stepSound.clip = stepsSoundEffect[GM.tileSetChoosen];
     }
 
+    /// <summary>
+    /// Method to debug the entire tree structure
+    /// </summary>
     private void DebugArbol()
     {
         Queue<BehaviourBlock> visited = new Queue<BehaviourBlock>();
@@ -175,6 +178,10 @@ public class EnemyAgent : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Clear all the blocks inside the block tree, it uses recursion
+    /// </summary>
+    /// <param name="block">Current block in the tree</param>
     private void ClearBlockTree(BehaviourBlock block)
     {
         for (int i = 0; i < block.children.Count; i++)
@@ -186,6 +193,9 @@ public class EnemyAgent : MonoBehaviour
         block = null;
     }
 
+    /// <summary>
+    /// This method create a matrix that represents all the Gameobjects (Tiles) that form the tileMap
+    /// </summary>
     private void GetGameObjectGrid()
     {
         if (predefinedPath != null && predefinedPath.gameObject.activeSelf)
@@ -264,13 +274,7 @@ public class EnemyAgent : MonoBehaviour
             GetGameData();
         }
 
-        var aux = currentBlock;
         currentBlock = currentBlock.Run(this, gameData);
-
-        if(currentBlock != aux)
-        {
-            Debug.Log(transform.name + "run a new Behaviour Block: " + currentBlock);
-        }
 
         // Restarting some behaviour variables
         if (currentBlock.ToString() != "Retreat" && retreating)
@@ -291,6 +295,10 @@ public class EnemyAgent : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Calculates the angle rotation that makes the enemy face its objective
+    /// </summary>
+    /// <param name="targetPos">Objective position in the game world</param>
     private void RotateEnemy(Vector3 targetPos)
     {
         // Calculate the rotation to face the player
@@ -601,6 +609,9 @@ public class EnemyAgent : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// The close combat enemy's method to attack the player
+    /// </summary>
     internal void Attack()
     {
         if (gameData["distanceToPlayer"] > 1.7f) // Get to hit distance of the player 
@@ -615,7 +626,7 @@ public class EnemyAgent : MonoBehaviour
 
             agent.SetDestination(currentWaypoint.position);
         }
-        else if(!isAttacking && !isBlocking)
+        else if(!isAttacking && !isBlocking) // Determine if the next move is attacking, protecting or waiting for the player's move
         {
             if (!agent.isStopped)
                 agent.isStopped = true;
@@ -638,6 +649,9 @@ public class EnemyAgent : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// The long distance enemy's method to attack the player
+    /// </summary>
     internal void Shoot()
     {
         // The enemy stops moving
@@ -665,7 +679,7 @@ public class EnemyAgent : MonoBehaviour
         {
             StartCoroutine(shootAnimation(playerDirection));
         }
-        else if (reloading)
+        else if (reloading) // Reloading the arrow
         {
             shootCoolDown -= Time.deltaTime;
             if (shootCoolDown < 0)
@@ -676,6 +690,10 @@ public class EnemyAgent : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// The method substracts the damage received to the enemy's health
+    /// </summary>
+    /// <param name="damage">The amount of damage received</param>
     public void ReceiveDamage(float damage)
     {
         GetComponent<Rigidbody>().isKinematic = false;
@@ -700,6 +718,9 @@ public class EnemyAgent : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// This method change the state of the enemy and makes the alert call for the others
+    /// </summary>
     internal void PlayerDetected()
     {
         playerDetected = true;
@@ -715,6 +736,10 @@ public class EnemyAgent : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Coroutine that executes the attack animation
+    /// </summary>
+    /// <returns></returns>
     IEnumerator attackAnimation()
     {
         effectSound.clip = enemyAttack;
@@ -731,6 +756,10 @@ public class EnemyAgent : MonoBehaviour
         isAttacking = false;
     }
 
+    /// <summary>
+    /// Coroutine that executes the block animation
+    /// </summary>
+    /// <returns></returns>
     IEnumerator blockAnimation()
     {
         isBlocking = true;
@@ -740,13 +769,16 @@ public class EnemyAgent : MonoBehaviour
         anim.SetBool("IsBlocking", false);
     }
 
+    /// <summary>
+    /// Coroutine that executes the aim and shoot animation
+    /// </summary>
+    /// <param name="playerDirection">Vector that represents the player's direction from the enemy's position</param>
+    /// <returns></returns>
     IEnumerator shootAnimation(Vector3 playerDirection)
     {
         effectSound.clip = bowCharge;
         effectSound.Play();
         isAttacking = true;
-
-        Debug.Log("Shooting arrow");
 
         anim.SetBool("IsShooting", true);
         Rigidbody rgbdArrow = Instantiate(arrow, shootPos.position, shootPos.rotation, shootPos).GetComponent<Rigidbody>();
@@ -758,6 +790,10 @@ public class EnemyAgent : MonoBehaviour
         isAttacking = false;
     }
 
+    /// <summary>
+    /// Coroutine that executes the enemy's death animation
+    /// </summary>
+    /// <returns></returns>
     IEnumerator DeathAnimation()
     {
         agent.isStopped = true;
@@ -789,6 +825,9 @@ public class EnemyAgent : MonoBehaviour
         GM.AddDeadEnemy();
     }
 
+    /// <summary>
+    /// This method introduces the environment info detected by the enemy inside the dictionary used by the behaviour blocks
+    /// </summary>
     private void GetGameData()
     {
         if (gameData.Count > 0) // Update the game data

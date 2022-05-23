@@ -15,6 +15,10 @@ public class Variable : ScriptableObject
     public float entropy;
     public GameObject tileReference;
 
+    /// <summary>
+    /// Initialise the variables to the base values
+    /// </summary>
+    /// <param name="size">tile set array length</param>
     public void SetVariable(int size)
     {
         int rotSize = 4;
@@ -35,6 +39,13 @@ public class Variable : ScriptableObject
         domainCount = size;
     }
 
+    /// <summary>
+    /// Instantiate the corresponding tile in the game world
+    /// </summary>
+    /// <param name="tile">Reference to the tile selected</param>
+    /// <param name="chosenIndex">Index that represents the position in the domain</param>
+    /// <param name="position"></param>
+    /// <param name="parent">Transform position of the tiles parent</param>
     internal void SetTile(GridTile tile, int chosenIndex, Vector3 position, Transform parent)
     {
         tileChosen = tile;
@@ -52,6 +63,10 @@ public class Variable : ScriptableObject
         tileReference = Instantiate(tile.gameObject, position, tileChosen.transform.rotation, parent);
     }
 
+    /// <summary>
+    /// Method that calulates the entropy value according to the available tiles of the domain
+    /// </summary>
+    /// <param name="tileSet">Reference to the tile set used to generare the tile map</param>
     public void CalculateEntropy(List<Tile> tileSet)
     {
         float auxiliar = 0f;

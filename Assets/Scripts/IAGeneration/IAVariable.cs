@@ -14,6 +14,10 @@ public class IAVariable : ScriptableObject
 
     private const int connectionsNum = 4;
 
+    /// <summary>
+    /// Established the variable in the grid
+    /// </summary>
+    /// <param name="size">Length of the block set array</param>
     public void SetVariable(int size)
     {
         children = new List<IAVariable>();
@@ -28,8 +32,14 @@ public class IAVariable : ScriptableObject
         domainCount = size;
     }
 
+    /// <summary>
+    /// Create the object that represent the final behaviour block that takes up a grid position
+    /// </summary>
+    /// <param name="currentBlock">Block selected from the block set</param>
+    /// <param name="index">Index of the block in the block set array</param>
     internal void SetBlock(Block currentBlock, int index)
     {
+        // Create the block object
         int[] Connections;
         switch (currentBlock.type.ToString())
         {
@@ -60,7 +70,7 @@ public class IAVariable : ScriptableObject
 
         blockChoosen.SetConnections(Connections);
 
-
+        //Remove the other blocks from the domain
         if(domainCount > 1)
         {
             domainCount = 1;
@@ -80,17 +90,23 @@ public class IAVariable : ScriptableObject
         }
     }
 
+    /// <summary>
+    /// Method that calculates the entropy value for each variable
+    /// </summary>
+    /// <param name="tileSet">Complete block set that it is being used in the generation</param>
     public void CalculateEntropy(Block[] tileSet)
     {
         float auxiliar = 0f;
         float maxWeight = 0f;
 
+        //Calculate the total weight of the active block in the domain
         for (int i = 0; i < tileSet.Length; i++)
         {
             if (domain[i])
                 maxWeight += tileSet[i].weight;
         }
 
+        // Calculate the entropy value using the entropy formula
         for (int i = 0; i < domain.Length; i++)
         {
             if (domain[i])

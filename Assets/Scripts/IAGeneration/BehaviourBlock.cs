@@ -12,6 +12,10 @@ public abstract class BehaviourBlock
 
     public List<BehaviourBlock> children;
     
+    /// <summary>
+    /// Establish the block children, that connect each block with the next executable block in the decision tree
+    /// </summary>
+    /// <param name="childrenVariables">Variables that represent these block in the grid</param>
     public void SetChildren(List<IAVariable> childrenVariables)
     {
         children = new List<BehaviourBlock>();
@@ -24,6 +28,10 @@ public abstract class BehaviourBlock
         }
     }
 
+    /// <summary>
+    /// Establish which are the connection constraint of the block
+    /// </summary>
+    /// <param name="Connections"></param>
     public void SetConnections(int[] Connections)
     {
         enterConnections = new int[Connections.Length/2];
@@ -38,11 +46,23 @@ public abstract class BehaviourBlock
         }
     }
 
+    /// <summary>
+    /// Method that contains the condition to execute the current behaviour block
+    /// </summary>
+    /// <param name="gameData">Dictionary that contains the environment information</param>
+    /// <returns>The condition is accomplished or not</returns>
     public abstract bool RunCondition(Dictionary<string, float> gameData);
 
+    /// <summary>
+    /// Method that calls the enemyAgent appropriate method
+    /// </summary>
+    /// <param name="enemyAgent">Reference to the agent that is executing the behaviour block</param>
+    /// <param name="gameData">Dictionary that contains the environment information</param>
+    /// <returns>Returns the next Behaviour block that have to be execute, if any</returns>
     public abstract BehaviourBlock Run(EnemyAgent enemyAgent, Dictionary<string, float> gameData);
 }
 
+// Patrol behaviour which inherit from the basic BehaviourBlock class
 public class Patrol : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
@@ -66,6 +86,7 @@ public class Patrol : BehaviourBlock
     }
 }
 
+// Retreat behaviour which inherit from the basic BehaviourBlock class
 public class Retreat : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
@@ -90,7 +111,7 @@ public class Retreat : BehaviourBlock
     }
 }
 
-
+// Strategic Positioning behaviour which inherit from the basic BehaviourBlock class
 public class StrategicPositioning : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
@@ -114,6 +135,7 @@ public class StrategicPositioning : BehaviourBlock
     }
 }
 
+// GetClose behaviour which inherit from the basic BehaviourBlock class
 public class GetClose : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
@@ -137,6 +159,7 @@ public class GetClose : BehaviourBlock
     }
 }
 
+// GetAway behaviour which inherit from the basic BehaviourBlock class
 public class GetAway : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
@@ -160,6 +183,7 @@ public class GetAway : BehaviourBlock
     }
 }
 
+// Attack behaviour which inherit from the basic BehaviourBlock class
 public class Attack : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)
@@ -183,6 +207,7 @@ public class Attack : BehaviourBlock
     }
 }
 
+// Shoot behaviour which inherit from the basic BehaviourBlock class
 public class Shoot : BehaviourBlock
 {
     public override bool RunCondition(Dictionary<string, float> gameData)

@@ -80,7 +80,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         transform.GetChild(1).transform.localPosition = new Vector3(0f, 0f, 0f);
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask); // Check if the player is touching the ground
 
         if (isGrounded && velocity.y < 0)
             velocity.y = -2f;
@@ -88,6 +88,7 @@ public class Player : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
+        // Control the movement of the player
         if (GetComponent<CharacterController>().enabled)
         {
             anim.SetFloat("GoingRight", x);
@@ -118,6 +119,7 @@ public class Player : MonoBehaviour
             controller.Move(velocity * Time.deltaTime);
         }
 
+        // Check if the player click the right mouse button
         if(Input.GetMouseButtonDown(0))
         {
             if (isInGenerationRoom)
@@ -141,6 +143,7 @@ public class Player : MonoBehaviour
             }
         }
 
+        // Check if the player click the left mouse button
         if (!isInGenerationRoom && Input.GetMouseButtonDown(1) && !isBlocking && !isAttacking)
         {
             StartCoroutine("SwordBlock");
@@ -148,6 +151,7 @@ public class Player : MonoBehaviour
                 StartCoroutine(ChangeWeaponGUI(swordGUI, shieldGUI));
         }
 
+        // Check if player gets damage to avoid doubling the damage received
         if (damaged)
         {
             damageTime += Time.deltaTime;
@@ -159,6 +163,10 @@ public class Player : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Coroutine that executes the attack animation of the player
+    /// </summary>
+    /// <returns></returns>
     IEnumerator SwordAttack()
     {
         isAttacking = true;
@@ -172,6 +180,10 @@ public class Player : MonoBehaviour
         isAttacking = false;
     }
 
+    /// <summary>
+    /// Coroutine that executes the block animation of the player
+    /// </summary>
+    /// <returns></returns>
     IEnumerator SwordBlock()
     {
         isBlocking = true;
@@ -181,6 +193,10 @@ public class Player : MonoBehaviour
         isBlocking = false;
     }
 
+    /// <summary>
+    /// Executing the player teleporting through the portal
+    /// </summary>
+    /// <param name="newPos">New position where the player is going to teleport to</param>
     public void PortalTeleport(Vector3 newPos)
     {
         stepSound.clip = stepSoundsClip[GM.tileSetChoosen];
@@ -188,12 +204,19 @@ public class Player : MonoBehaviour
         Respawn(newPos);
     }
 
+    /// <summary>
+    /// Respawning the player to the new position
+    /// </summary>
+    /// <param name="newPos">New position where the player</param>
     public void Respawn(Vector3 newPos)
     {
         transform.position = newPos;
         StartCoroutine("ActivateCharacterController");
     }
 
+    /// <summary>
+    /// Change fighting phase in the tutorial
+    /// </summary>
     public void EnterFightingPhase()
     {
         handGUI.SetActive(false);
@@ -201,6 +224,9 @@ public class Player : MonoBehaviour
         isInGenerationRoom = false;
     }
 
+    /// <summary>
+    /// Change interactive phase in the tutorial
+    /// </summary>
     public void EnterInteractivPhase()
     {
         swordGUI.SetActive(false);
@@ -208,6 +234,10 @@ public class Player : MonoBehaviour
         isInGenerationRoom = true;
     }
 
+    /// <summary>
+    /// Coroutine that activate the character controller  object 
+    /// </summary>
+    /// <returns></returns>
     IEnumerator ActivateCharacterController()
     {
         GetComponent<CharacterController>().enabled = false;
@@ -215,9 +245,14 @@ public class Player : MonoBehaviour
         GetComponent<CharacterController>().enabled = true;
     }
 
+
+    /// <summary>
+    /// The player receive damage from the enemy
+    /// </summary>
+    /// <param name="damage">Amount of damage received by the player</param>
+    /// <param name="colliseumBottom">Boolean that control if the player fall in the pit</param>
     public void ReceiveDamage(float damage, bool colliseumBottom)
     {
-        Debug.Log("Recibe daño. Protegiendo: " + isBlocking);
         if (colliseumBottom || (!isBlocking && !damaged) )
         {
             effectSound.clip = hurtSound;
@@ -240,6 +275,9 @@ public class Player : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Changing the life bar size that represents the health amount
+    /// </summary>
     private void ChangeLifeBarGUI()
     {
         float newWidth = lifeBar.sizeDelta.x * health / 10f;
@@ -256,6 +294,10 @@ public class Player : MonoBehaviour
             lifeBar.gameObject.GetComponent<Image>().color = Color.red;
     }
 
+    /// <summary>
+    /// Coroutine that executes the dying animation
+    /// </summary>
+    /// <returns></returns>
     IEnumerator DeadAnimation()
     {
         anim.SetBool("IsAttacking", false);
@@ -272,6 +314,12 @@ public class Player : MonoBehaviour
         GM.PlayerIsDead();
     }
 
+    /// <summary>
+    /// Coroutine that change the weapon image in the GUI
+    /// </summary>
+    /// <param name="currentGUI">Weapon that it is being shown</param>
+    /// <param name="nextGUI">Next weapon</param>
+    /// <returns></returns>
     IEnumerator ChangeWeaponGUI(GameObject currentGUI, GameObject nextGUI)
     {
         weaponGUIisChanging = true;

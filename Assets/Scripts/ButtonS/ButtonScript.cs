@@ -55,6 +55,7 @@ public class ButtonScript : MonoBehaviour
         {
             if (buttonPressed)
             {
+                // Determining which is the type of the button pressed to know which method has to be called
                 if (transform.name == "Generate" && buttonActivate)
                 {
                     GM.ClearTileSet();
@@ -73,6 +74,7 @@ public class ButtonScript : MonoBehaviour
             }
             else
             {
+                // Determining which is the type of the button pressed to know which method has to be called
                 if (transform.name == "Generate" && buttonActivate)
                 {
                     GM.GenerateTileSet();

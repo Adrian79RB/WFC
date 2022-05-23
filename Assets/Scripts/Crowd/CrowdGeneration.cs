@@ -10,6 +10,7 @@ public class CrowdGeneration : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //Random generation of the characters that take up the crowd positions
         for (int i = 0; i < transform.childCount; i++)
         {
             var pos = Mathf.RoundToInt(Random.value * (crowdCharacters.Length - 1));
