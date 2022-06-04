@@ -15518,8 +15518,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   entranceCam: {fileID: 0}
+  exitCam: {fileID: 0}
   cameraMat: {fileID: 0}
+  cameraMat2: {fileID: 0}
   arenaPortal: {fileID: 0}
+  initRoomPortal: {fileID: 0}
   predefinedPaths: []
   entrances: []
   fortress: []
@@ -17903,9 +17906,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: e3b0f4df9dd59b54fb6e0efba3edbb10, type: 3}
     m_FontSize: 40
-    m_FontStyle: 1
+    m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 60
@@ -18801,7 +18804,7 @@ MonoBehaviour:
   - WASD TO MOVE AROUND
   - RIGHT CLICK TO INTERACT
   - THE BUTTONS ACTIVATE THE TILES
-  - THE GREEN BUTTON GENRATE THE TERRAIN
+  - THE GREEN BUTTON GENERATE THE TERRAIN
   - THE YELLOW BUTTON ACTIVATE THE BEHAVIOUR BLOCK
   - RIGHT CLICK TO ATTACK
   - LEFT CLICK TO BLOCK
@@ -28158,7 +28161,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: e3b0f4df9dd59b54fb6e0efba3edbb10, type: 3}
     m_FontSize: 46
     m_FontStyle: 1
     m_BestFit: 0

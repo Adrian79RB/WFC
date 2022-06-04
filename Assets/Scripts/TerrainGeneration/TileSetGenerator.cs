@@ -60,7 +60,8 @@ public class TileSetGenerator : MonoBehaviour
             predefinedPathCoor = new int[predefinedPath.childCount, 2];
             for (int i = 0; i < predefinedPath.childCount; i++)
             {
-                int[] coor = { Mathf.FloorToInt(predefinedPath.GetChild(i).position.z), Mathf.FloorToInt(predefinedPath.GetChild(i).position.x) };
+                int[] coor = { Mathf.FloorToInt(predefinedPath.GetChild(i).position.z), 
+                        Mathf.FloorToInt(predefinedPath.GetChild(i).position.x) };
                 predefinedPathCoor[i, 0] = coor[0];
                 predefinedPathCoor[i, 1] = coor[1];
                 int choosenTile = -1;
@@ -140,13 +141,17 @@ public class TileSetGenerator : MonoBehaviour
                 for(int index = 0; index < predefinedPathCoor.GetLength(0); index++)
                 {
                     if (predefinedPathCoor[index, 1] > 0)
-                        ConstraintPropagation(predefinedPathCoor[index, 0], predefinedPathCoor[index, 1] - 1, 3, grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
+                        ConstraintPropagation(predefinedPathCoor[index, 0], predefinedPathCoor[index, 1] - 1, 3,
+                         grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
                     if (predefinedPathCoor[index, 1] < (numCol - 1))
-                        ConstraintPropagation(predefinedPathCoor[index, 0], predefinedPathCoor[index, 1] + 1, 1, grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
+                        ConstraintPropagation(predefinedPathCoor[index, 0], predefinedPathCoor[index, 1] + 1, 1, 
+                        grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
                     if (predefinedPathCoor[index, 0] > 0)
-                        ConstraintPropagation(predefinedPathCoor[index, 0] - 1, predefinedPathCoor[index, 1], 2, grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
+                        ConstraintPropagation(predefinedPathCoor[index, 0] - 1, predefinedPathCoor[index, 1], 2, 
+                        grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
                     if (predefinedPathCoor[index, 0] < (numRow - 1))
-                        ConstraintPropagation(predefinedPathCoor[index, 0] + 1, predefinedPathCoor[index, 1], 0, grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
+                        ConstraintPropagation(predefinedPathCoor[index, 0] + 1, predefinedPathCoor[index, 1], 0, 
+                        grid[predefinedPathCoor[index, 0], predefinedPathCoor[index, 1]], 0);
                 }
 
                 int[] nextCel = SearchNextGridCell();
